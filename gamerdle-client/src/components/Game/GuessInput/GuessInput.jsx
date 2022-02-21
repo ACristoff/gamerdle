@@ -1,11 +1,14 @@
+import React, { useState } from 'react'
 import { TextField } from '@material-ui/core'
-import React from 'react'
+
 
 const GuessInput = () => {
+  const [guess, setGuess] = useState('')
+
   return (
     <div>
-      GuessInput <br></br>
-      <TextField placeholder='Guess a random game!' />
+      GuessInput: {guess}<br></br> 
+      <TextField placeholder='Guess a random game!' onChange={(e) => setGuess(e.target.value)}/>
     </div>
   )
 }
