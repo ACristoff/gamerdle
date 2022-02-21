@@ -24,6 +24,16 @@
   color: white;
 }
 
+.guessForm {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.guessInput input{
+  color:aliceblue;
+}
+
 /* .Footer {
 
 } */
