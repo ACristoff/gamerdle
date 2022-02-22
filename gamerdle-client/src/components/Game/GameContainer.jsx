@@ -1,30 +1,92 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
-import { TextField, Button } from '@material-ui/core'
+import { TextField, Button } from '@material-ui/core';
 
 
 const GameContainer = () => {
-
+  const client_ID = process.env.REACT_APP_CLIENT_ID;
+  const client_SECRET = process.env.REACT_APP_CLIENT_SECRET;
+  const [token, setToken] = useState('');
   const [guess, setGuess] = useState('');
   const [guesses, setGuesses] = useState([]);
   const [guessData, setGuessData] = useState({});
 
-  const handleGuessSubmit = (e) => {
-    // guesses.length === 6 ? return null : 
+  const CORS_ANYWHERE_URL = 'https://acristoff-cors-anywhere.herokuapp.com'
+  const API_URL = 'https://api.igdb.com/v4'
 
+  const handleGuessSubmit = (e) => {
+    // guesses.length === 6 ?
     e.preventDefault();
-    setGuesses([...guesses, guess])
+    setGuesses([...guesses, guess]);
+    getGuessData(guess);
     setGuess('');
   }
 
-  
+  const getToken = () => {
+    try {
+      axios({
+        method: 'POST',
+        url: `https://id.twitch.tv/oauth2/token?client_id=${client_ID}&client_secret=${client_SECRET}&grant_type=client_credentials`,
+      }).then((res) => {
+        console.log(res)
+        setToken(res.data.access_token)
+      });
+    } catch (error) {
+      console.log(error)
+    }
+  };
+
+  const getGuessData = async (guessedGame) => {
+    const bodyData = `search "${guessedGame}"; fields alternative_name,character,checksum,collection,company,description,game,name,platform,published_at,test_dummy,theme;`
+    
+    axios({
+      method: 'POST',
+      url: `${CORS_ANYWHERE_URL}/${API_URL}/search/`,
+      headers: {
+        'Accept': 'application/json',
+        'Client-ID': client_ID,
+        'Authorization': `Bearer ${token}`,
+      },
+      data: bodyData
+    }).then(response => {
+      console.log(response.data)
+      console.log('boop')
+    })
+    .catch (error => {
+      console.log(error)
+    });
+  }
+
+  // axios({
+  //   url: "https://api.igdb.com/v4/search",
+  //   method: 'POST',
+  //   headers: {
+  //       'Accept': 'application/json',
+  //       'Client-ID: Client ID',
+  //       'Authorization: Bearer access_token',
+  //   },
+  //   data: "fields alternative_name,character,checksum,collection,company,description,game,name,platform,published_at,test_dummy,theme;"
+  // })
+  // .then(response => {
+  //     console.log(response.data);
+  // })
+  // .catch(err => {
+  //     console.error(err);
+  // });
+
+  useEffect(() => {
+    if (!token) {
+      getToken()
+    }
+  }, [token]);
 
   return (
     <div>
 
 
       <div className='guessData'>
-        current guessData: {guessData.title ? guessData : 'empty'}
+        current guessData: {guessData.title ? guessData.title : 'empty'}
         <div className={guesses[0] ? 'GuessAnalysis' : 'BlankGuess'}>{guesses[0]}</div>
         <div className={guesses[1] ? 'GuessAnalysis' : 'BlankGuess'}>{guesses[1]}</div>
         <div className={guesses[2] ? 'GuessAnalysis' : 'BlankGuess'}>{guesses[2]}</div>
