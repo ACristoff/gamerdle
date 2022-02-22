@@ -7,8 +7,11 @@ const GameContainer = () => {
 
   const [guess, setGuess] = useState('');
   const [guesses, setGuesses] = useState([]);
+  const [guessData, setGuessData] = useState({});
 
   const handleGuessSubmit = (e) => {
+    // guesses.length === 6 ? return null : 
+
     e.preventDefault();
     setGuesses([...guesses, guess])
     setGuess('');
@@ -18,7 +21,10 @@ const GameContainer = () => {
 
   return (
     <div>
+
+
       <div className='guessData'>
+        current guessData: {guessData.title ? guessData : 'empty'}
         <div className={guesses[0] ? 'GuessAnalysis' : 'BlankGuess'}>{guesses[0]}</div>
         <div className={guesses[1] ? 'GuessAnalysis' : 'BlankGuess'}>{guesses[1]}</div>
         <div className={guesses[2] ? 'GuessAnalysis' : 'BlankGuess'}>{guesses[2]}</div>
