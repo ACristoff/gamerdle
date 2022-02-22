@@ -11,6 +11,8 @@ const GameContainer = () => {
   const [guess, setGuess] = useState('');
   const [guesses, setGuesses] = useState([]);
   const [guessData, setGuessData] = useState({});
+  const [answer, setAnswer] = useState('Dark Souls 2 Scholar of The First Sin')
+  const [answerData, setAnswerData] = useState({})
 
   const CORS_ANYWHERE_URL = 'https://acristoff-cors-anywhere.herokuapp.com'
   const API_URL = 'https://api.igdb.com/v4'
@@ -23,7 +25,7 @@ const GameContainer = () => {
     setGuess('');
   }
 
-  const getToken = () => {
+  const getToken = async () => {
     try {
       axios({
         method: 'POST',
@@ -38,6 +40,8 @@ const GameContainer = () => {
   };
 
   const getGuessData = async (guessedGame) => {
+    getAnswerData()
+
     const bodyData = `search "${guessedGame}"; fields alternative_name,character,checksum,collection,company,description,game,name,platform,published_at,test_dummy,theme;`
     
     axios({
@@ -51,29 +55,31 @@ const GameContainer = () => {
       data: bodyData
     }).then(response => {
       console.log(response.data)
-      console.log('boop')
     })
     .catch (error => {
       console.log(error)
     });
   }
 
-  // axios({
-  //   url: "https://api.igdb.com/v4/search",
-  //   method: 'POST',
-  //   headers: {
-  //       'Accept': 'application/json',
-  //       'Client-ID: Client ID',
-  //       'Authorization: Bearer access_token',
-  //   },
-  //   data: "fields alternative_name,character,checksum,collection,company,description,game,name,platform,published_at,test_dummy,theme;"
-  // })
-  // .then(response => {
-  //     console.log(response.data);
-  // })
-  // .catch(err => {
-  //     console.error(err);
-  // });
+  const getAnswerData = async () => {
+    const bodyData = `search "dark souls"; fields *; limit 10;`
+    // search "nier"; fields *; limit 10;
+    axios({
+      method: 'POST',
+      url: `${CORS_ANYWHERE_URL}/${API_URL}/games/`,
+      headers: {
+        'Accept': 'application/json',
+        'Client-ID': client_ID,
+        'Authorization': `Bearer ${token}`,
+      },
+      data: bodyData
+    }).then(response => {
+      console.log(response.data)
+    })
+    .catch(error => {
+      console.log(error)
+    })
+  }
 
   useEffect(() => {
     if (!token) {
