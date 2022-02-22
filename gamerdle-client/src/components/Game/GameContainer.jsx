@@ -11,7 +11,7 @@ const GameContainer = () => {
   const [guess, setGuess] = useState('');
   const [guesses, setGuesses] = useState([]);
   const [guessData, setGuessData] = useState({});
-  const [answer, setAnswer] = useState('Dark Souls 2 Scholar of The First Sin')
+  const [answer, setAnswer] = useState('Dark Souls')
   const [answerData, setAnswerData] = useState({})
 
   const CORS_ANYWHERE_URL = 'https://acristoff-cors-anywhere.herokuapp.com'
@@ -75,6 +75,7 @@ const GameContainer = () => {
       data: bodyData
     }).then(response => {
       console.log(response.data)
+      setAnswerData(response.data[0])
     })
     .catch(error => {
       console.log(error)
@@ -84,6 +85,8 @@ const GameContainer = () => {
   useEffect(() => {
     if (!token) {
       getToken()
+    } else {
+      getAnswerData()
     }
   }, [token]);
 
@@ -92,6 +95,7 @@ const GameContainer = () => {
 
 
       <div className='guessData'>
+        answer: {answerData.name ? answerData.name : 'null'} &nbsp;
         current guessData: {guessData.title ? guessData.title : 'empty'}
         <div className={guesses[0] ? 'GuessAnalysis' : 'BlankGuess'}>{guesses[0]}</div>
         <div className={guesses[1] ? 'GuessAnalysis' : 'BlankGuess'}>{guesses[1]}</div>
