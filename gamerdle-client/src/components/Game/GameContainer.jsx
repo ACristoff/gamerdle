@@ -3,6 +3,17 @@ import axios from 'axios';
 
 import { TextField, Button } from '@material-ui/core';
 
+//set up an algorithm for designating the day's puzzle using local time date
+//only {games} in the top 300
+
+//comparison logic for correct information relating to the answer from the guess data
+//eg release dates, ESRB rating, developer, game platform
+
+//rendering for guess data
+
+//___
+
+//future stuff: connecting to different API's for movies, books, tv shows, anime
 
 const GameContainer = () => {
   const client_ID = process.env.REACT_APP_CLIENT_ID;
@@ -11,7 +22,7 @@ const GameContainer = () => {
   const [guess, setGuess] = useState('');
   const [guesses, setGuesses] = useState([]);
   const [guessData, setGuessData] = useState({});
-  const [answerData, setAnswerData] = useState({})
+  const [answerData, setAnswerData] = useState({});
 
   const CORS_ANYWHERE_URL = 'https://acristoff-cors-anywhere.herokuapp.com'
   const API_URL = 'https://api.igdb.com/v4'
