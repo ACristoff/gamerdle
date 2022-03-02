@@ -107,6 +107,7 @@ const GameContainer = () => {
     <div>
       <div className='answerData'>
         answer: {answerData.name ? answerData.name : 'null'}
+        {new Date(answerData.first_release_date).toLocaleDateString("en-US")}
       </div>
 
       <div className='guessData'>
