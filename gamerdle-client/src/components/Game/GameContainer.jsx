@@ -11,7 +11,6 @@ const GameContainer = () => {
   const [guess, setGuess] = useState('');
   const [guesses, setGuesses] = useState([]);
   const [guessData, setGuessData] = useState({});
-  const [answer, setAnswer] = useState('Dark Souls')
   const [answerData, setAnswerData] = useState({})
 
   const CORS_ANYWHERE_URL = 'https://acristoff-cors-anywhere.herokuapp.com'
@@ -40,13 +39,16 @@ const GameContainer = () => {
   };
 
   const getGuessData = async (guessedGame) => {
-    getAnswerData()
+    // getAnswerData() why did I put this in here again ???
 
-    const bodyData = `search "${guessedGame}"; fields alternative_name,character,checksum,collection,company,description,game,name,platform,published_at,test_dummy,theme;`
+    //below commented code is for using /search/ instead of /games/ which seems to be less accurate (?)
+    // const bodyData = `search "${guessedGame}"; fields alternative_name,character,checksum,collection,company,description,game,name,platform,published_at,test_dummy,theme;`
+    const bodyData = `search "${guessedGame}"; fields *; limit 1;`
     
     axios({
       method: 'POST',
-      url: `${CORS_ANYWHERE_URL}/${API_URL}/search/`,
+      // url: `${CORS_ANYWHERE_URL}/${API_URL}/search/`,
+      url: `${CORS_ANYWHERE_URL}/${API_URL}/games/`,
       headers: {
         'Accept': 'application/json',
         'Client-ID': client_ID,
@@ -62,8 +64,8 @@ const GameContainer = () => {
   }
 
   const getAnswerData = async () => {
-    const bodyData = `search "dark souls"; fields *; limit 10;`
-    // search "nier"; fields *; limit 10;
+    const bodyData = `search "dark souls"; fields *; limit 1;`
+    // `search "nier"; fields *; limit 10;`
     axios({
       method: 'POST',
       url: `${CORS_ANYWHERE_URL}/${API_URL}/games/`,
@@ -92,10 +94,11 @@ const GameContainer = () => {
 
   return (
     <div>
-
+      <div className='answerData'>
+        answer: {answerData.name ? answerData.name : 'null'}
+      </div>
 
       <div className='guessData'>
-        answer: {answerData.name ? answerData.name : 'null'} &nbsp;
         current guessData: {guessData.title ? guessData.title : 'empty'}
         <div className={guesses[0] ? 'GuessAnalysis' : 'BlankGuess'}>{guesses[0]}</div>
         <div className={guesses[1] ? 'GuessAnalysis' : 'BlankGuess'}>{guesses[1]}</div>
