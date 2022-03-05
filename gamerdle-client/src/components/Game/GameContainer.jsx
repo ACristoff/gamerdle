@@ -3,6 +3,7 @@ import axios from 'axios';
 
 import { TextField, Button } from '@material-ui/core';
 
+//OPTIONAL: This can just be set up manually so that each day just has a predetermined manually selected game to select.
 //set up an algorithm for designating the day's puzzle using local time date
 //only {games} in the top 300
 
@@ -52,7 +53,7 @@ const GameContainer = () => {
   const getGuessData = async (guessedGame) => {
     // getAnswerData() why did I put this in here again ???
 
-    //below commented code is for using /search/ instead of /games/ which seems to be less accurate (?)
+    // below commented code is for using /search/ instead of /games/ which seems to be less accurate (?)
     // const bodyData = `search "${guessedGame}"; fields alternative_name,character,checksum,collection,company,description,game,name,platform,published_at,test_dummy,theme;`
     const bodyData = `search "${guessedGame}"; fields *; limit 1;`
     
@@ -76,6 +77,7 @@ const GameContainer = () => {
 
   const getAnswerData = async () => {
     const bodyData = `search "dark souls"; fields *; limit 1;`
+    // Example query for /games/ endpoint
     // `search "nier"; fields *; limit 10;`
     axios({
       method: 'POST',
