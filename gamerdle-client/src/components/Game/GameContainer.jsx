@@ -91,6 +91,7 @@ const GameContainer = () => {
     }).then(response => {
       console.log(response.data)
       setAnswerData(response.data[0])
+      console.log(answerData)
     })
     .catch(error => {
       console.log(error)
