@@ -7,10 +7,31 @@ import { TextField, Button } from '@material-ui/core';
 //set up an algorithm for designating the day's puzzle using local time date
 //only {games} in the top 300
 
-//comparison logic for correct information relating to the answer from the guess data
-//eg release dates, ESRB rating, developer, game platform
+//Spread the information correctly into answerData and pull from it
+//Spread the information correctly only into GuessData and deprecate guesses
+//Consider unifying the state data for all the game data into one
+
+//Set up error handling for when no game comes up from the search
+
+//Edge case: Doom produces a rerelease of doom rather than the original copy of doom 1993
+//Possible solution: Pull the top 5 results from the /games endpoint and sort by rating then write the top one to guessData
+  //Possible problem: what if that messes with another answer/guess combination? Must test further
+
+//set up proper error reporting through console.error console.alert and time the amount of time it takes to make requests using console.time
+
+//comparison logic for correct information relating to the answer from the guess data, this requires proper spreading from above tasks
+//eg release date year, ESRB rating, developer, game platform
 
 //rendering for guess data
+
+//Save guess data to local storage
+  //pull guess data from local storage
+
+//share results as a series of emojis and a link to the website
+
+//Fail state
+  //Show answer upon failure
+//Success state
 
 //___
 
@@ -24,6 +45,8 @@ const GameContainer = () => {
   const [guesses, setGuesses] = useState([]);
   const [guessData, setGuessData] = useState({});
   const [answerData, setAnswerData] = useState({});
+
+  const day = new Date().toISOString().slice(0, 10);
 
   const CORS_ANYWHERE_URL = 'https://acristoff-cors-anywhere.herokuapp.com'
   const API_URL = 'https://api.igdb.com/v4'
@@ -55,7 +78,7 @@ const GameContainer = () => {
 
     // below commented code is for using /search/ instead of /games/ which seems to be less accurate (?)
     // const bodyData = `search "${guessedGame}"; fields alternative_name,character,checksum,collection,company,description,game,name,platform,published_at,test_dummy,theme;`
-    const bodyData = `search "${guessedGame}"; fields *; limit 1;`
+    const bodyData = `search "${guessedGame}"; fields *; limit 5;`
     
     axios({
       method: 'POST',
@@ -99,6 +122,10 @@ const GameContainer = () => {
   }
 
   useEffect(() => {
+    setGuessData({
+      ...guessData,
+      [day]: []
+    })
     if (!token) {
       getToken()
     } else {
@@ -110,7 +137,7 @@ const GameContainer = () => {
     <div>
       <div className='answerData'>
         answer: {answerData.name ? answerData.name : 'null'}
-        {new Date(answerData.first_release_date).toLocaleDateString("en-US")}
+        {new Date(answerData.first_release_date * 1000).toLocaleString("en-US").slice(5,9) }
       </div>
 
       <div className='guessData'>
