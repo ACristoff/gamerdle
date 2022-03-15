@@ -91,7 +91,7 @@ const GameContainer = () => {
       },
       data: bodyData
     }).then(response => {
-      console.log(response.data)
+      // console.log(response.data)
     })
     .catch (error => {
       console.log(error)
@@ -112,9 +112,9 @@ const GameContainer = () => {
       },
       data: bodyData
     }).then(response => {
-      console.log(response.data)
+      // console.log(response.data)
       setAnswerData(response.data[0])
-      console.log(answerData)
+      // console.log(answerData)
     })
     .catch(error => {
       console.log(error)
@@ -126,6 +126,7 @@ const GameContainer = () => {
       ...guessData,
       [day]: []
     })
+    console.log(guessData)
     if (!token) {
       getToken()
     } else {
