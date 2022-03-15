@@ -7,25 +7,29 @@ import { TextField, Button } from '@material-ui/core';
 //set up an algorithm for designating the day's puzzle using local time date
 //only {games} in the top 300
 
-//Spread the information correctly into answerData and pull from it
-//Spread the information correctly only into GuessData and deprecate guesses
-//Consider unifying the state data for all the game data into one
+//Set up a manual library of answers for people to play for
+
+//Spread the information correctly into answerData and pull from it DONE
+//Spread the information correctly only into GuessData and deprecate guesses DONE
+//Consider unifying the state data for all the game data into one DONE
 
 //Set up error handling for when no game comes up from the search
 
 //Edge case: Doom produces a rerelease of doom rather than the original copy of doom 1993
 //Possible solution: Pull the top 5 results from the /games endpoint and sort by rating then write the top one to guessData
   //Possible problem: what if that messes with another answer/guess combination? Must test further
+//
 
 //set up proper error reporting through console.error console.alert and time the amount of time it takes to make requests using console.time
 
 //comparison logic for correct information relating to the answer from the guess data, this requires proper spreading from above tasks
 //eg release date year, ESRB rating, developer, game platform
 
-//rendering for guess data
+//rendering for guess data DONE
 
 //Save guess data to local storage
   //pull guess data from local storage
+//
 
 //share results as a series of emojis and a link to the website
 
@@ -42,21 +46,34 @@ const GameContainer = () => {
   const client_SECRET = process.env.REACT_APP_CLIENT_SECRET;
   const [token, setToken] = useState('');
   const [guess, setGuess] = useState('');
-  const [guesses, setGuesses] = useState([]);
-  const [guessData, setGuessData] = useState({});
-  const [answerData, setAnswerData] = useState({});
 
   const day = new Date().toISOString().slice(0, 10);
+  const [gameData, setGameData] = useState({
+    guessData: {[day]: []},
+    answerData: {},
+    resultsData: {[day]: []}
+  })
+  //sample resultsData
+  //{"2022-03-15":[
+  //   {"name":"Dark Souls", raw: {...},"year":"Correct"}
+  // ]}
+
+  //sample guessData
+  //{"2022-03-15":[
+  //   {"name":"Dark Souls", raw: {...},"year":"Correct"}
+  // ]}
+
+  //sample answerData
+  //{}
+
+  
 
   const CORS_ANYWHERE_URL = 'https://acristoff-cors-anywhere.herokuapp.com'
   const API_URL = 'https://api.igdb.com/v4'
 
   const handleGuessSubmit = (e) => {
-    // guesses.length === 6 ?
     e.preventDefault();
-    setGuesses([...guesses, guess]);
     getGuessData(guess);
-    setGuess('');
   }
 
   const getToken = async () => {
@@ -74,11 +91,9 @@ const GameContainer = () => {
   };
 
   const getGuessData = async (guessedGame) => {
-    // getAnswerData() why did I put this in here again ???
-
     // below commented code is for using /search/ instead of /games/ which seems to be less accurate (?)
     // const bodyData = `search "${guessedGame}"; fields alternative_name,character,checksum,collection,company,description,game,name,platform,published_at,test_dummy,theme;`
-    const bodyData = `search "${guessedGame}"; fields *; limit 5;`
+    const bodyData = `search "${guessedGame}"; fields *; limit 1;`
     
     axios({
       method: 'POST',
@@ -92,6 +107,15 @@ const GameContainer = () => {
       data: bodyData
     }).then(response => {
       // console.log(response.data)
+      const releaseDateOfGame = Number(new Date(response.data[0].first_release_date * 1000).toLocaleString("en-US").slice(5,9))
+      const newGuessData = gameData.guessData[day]
+      newGuessData.push(({
+        guessName: response.data[0].name, 
+        raw: response.data[0],
+        releaseDate: releaseDateOfGame
+      }))
+      setGameData({...gameData, guessData: {[day]: newGuessData}})
+      setGuess('');
     })
     .catch (error => {
       console.log(error)
@@ -113,8 +137,15 @@ const GameContainer = () => {
       data: bodyData
     }).then(response => {
       // console.log(response.data)
-      setAnswerData(response.data[0])
-      // console.log(answerData)
+      const releaseDateOfGame = Number(new Date(response.data[0].first_release_date * 1000).toLocaleString("en-US").slice(5,9))
+      setGameData({
+        ...gameData,
+        answerData: {
+          raw: response.data[0],
+          releaseDate: releaseDateOfGame,
+          gameName: response.data[0].name
+        }  
+      })
     })
     .catch(error => {
       console.log(error)
@@ -122,33 +153,30 @@ const GameContainer = () => {
   }
 
   useEffect(() => {
-    setGuessData({
-      ...guessData,
-      [day]: []
-    })
-    console.log(guessData)
     if (!token) {
       getToken()
     } else {
       getAnswerData()
-    }
+    };
   }, [token]);
+
+  useEffect(() => {
+    console.log(gameData)
+  }, [gameData])
 
   return (
     <div>
       <div className='answerData'>
-        answer: {answerData.name ? answerData.name : 'null'}
-        {new Date(answerData.first_release_date * 1000).toLocaleString("en-US").slice(5,9) }
+        Answer: {gameData.answerData.gameName ? gameData.answerData.gameName : 'null'} <br></br>
+        Release Date: {gameData.answerData.releaseDate}
       </div>
-
       <div className='guessData'>
-        current guessData: {guessData.title ? guessData.title : 'empty'}
-        <div className={guesses[0] ? 'GuessAnalysis' : 'BlankGuess'}>{guesses[0]}</div>
-        <div className={guesses[1] ? 'GuessAnalysis' : 'BlankGuess'}>{guesses[1]}</div>
+        current guessData: {gameData.guessData[day][gameData.guessData[day].length - 1] ? gameData.guessData[day][gameData.guessData[day].length - 1].guessName : 'empty'}
+        {/* <div className={guesses[1] ? 'GuessAnalysis' : 'BlankGuess'}>{guesses[1]}</div>
         <div className={guesses[2] ? 'GuessAnalysis' : 'BlankGuess'}>{guesses[2]}</div>
         <div className={guesses[3] ? 'GuessAnalysis' : 'BlankGuess'}>{guesses[3]}</div>
         <div className={guesses[4] ? 'GuessAnalysis' : 'BlankGuess'}>{guesses[4]}</div>
-        <div className={guesses[5] ? 'GuessAnalysis' : 'BlankGuess'}>{guesses[5]}</div>
+        <div className={guesses[5] ? 'GuessAnalysis' : 'BlankGuess'}>{guesses[5]}</div> */}
       </div>
     
       <div className='guessSubmission' style={{marginTop: '2em'}}>
@@ -165,19 +193,3 @@ const GameContainer = () => {
 };
 
 export default GameContainer;
-
-// sample guess data saved to localStorage
-// {"2022-02-17":[
-//   {"name":"NEW ZEALAND","distance":0,"direction":"N"}
-// ],
-// "2022-02-19":[
-//   {"name":"TURKEY","distance":5850222,"direction":"S"},
-//   {"name":"SOUTH AFRICA","distance":2004357,"direction":"NNE"},
-//   {"name":"MOZAMBIQUE","distance":1026924,"direction":"NW"},
-//   {"name":"ZAMBIA","distance":0,"direction":"N"}
-// ],
-// "2022-02-20":[
-//   {"name":"MALAYSIA","distance":7734305,"direction":"WNW"},
-//   {"name":"TURKMENISTAN","distance":1415632,"direction":"WNW"},
-//   {"name":"GEORGIA","distance":0,"direction":"N"}
-// ]}
