@@ -96,7 +96,7 @@ const GameContainer = () => {
   const getGuessData = async (guessedGame) => {
     // below commented code is for using /search/ instead of /games/ which seems to be less accurate (?)
     // const bodyData = `search "${guessedGame}"; fields alternative_name,character,checksum,collection,company,description,game,name,platform,published_at,test_dummy,theme;`
-    const bodyData = `search "${guessedGame}"; fields *, age_ratings.*, involved_companies.*, involved_companies.company.*; limit 1;`
+    const bodyData = `search "${guessedGame}"; fields *, age_ratings.*, involved_companies.*, involved_companies.company.*, genres.*; limit 1;`
     
     axios({
       method: 'POST',
@@ -143,7 +143,7 @@ const GameContainer = () => {
   }
 
   const getAnswerData = async () => {
-    const bodyData = `search "dark souls"; fields *, age_ratings.*; limit 1;`
+    const bodyData = `search "dark souls"; fields *, age_ratings.*, involved_companies.*, involved_companies.company.*, genres.*; limit 1;`
     // Example query for /games/ endpoint
     // `search "nier"; fields *; limit 10;`
     // where version_parent = null
@@ -186,13 +186,20 @@ const GameContainer = () => {
     //compare release date
     //there has to be a more elegant solution than this
     if (guess.releaseDate === answer.releaseDate) {
-      result.year = `${guess.releaseDate}: ✅ Same Year`
+      result.year = `${guess.releaseDate}: ✅ Same year`
     } else if (guess.releaseDate > answer.releaseDate) {
       result.year = `${guess.releaseDate}: ❌ Too new`
     } else {
       result.year = `${guess.releaseDate}: ❌ Too old`
     }
 
+    if (guess.ratingEnum === answer.ratingEnum) {
+      result.rating = `${guess.rating}: ✅ Same rating`
+    } else if (guess.ratingEnum > answer.ratingEnum) {
+      result.rating = `${guess.rating}: ❌ Too mature`
+    } else {
+      result.rating = `${guess.rating}: ❌ Not mature enough`
+    }
 
     //push that results object to gameData through setGameData by correctly spreading the information
     console.log(result)
