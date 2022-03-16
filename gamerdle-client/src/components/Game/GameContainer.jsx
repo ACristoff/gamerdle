@@ -83,15 +83,18 @@ const GameContainer = () => {
       }
       const releaseDateOfGame = Number(new Date(response.data[0].first_release_date * 1000).toLocaleDateString("en-us").slice(-4))
       //check to see if ratingOfGame remains accurate through debugging, otherwise make an algorithm to only select the one that has category = 0 (esrb category) DONE
+      //implement this into getAnswerData
       let ratingOfGame = null;
-      for (const rating of response.data[0]?.age_ratings) {
-        if (rating.category === 1) {
-          ratingOfGame = parseRating(rating.rating)
+      let ratingEnum = null;
+      if (response.data[0].age_ratings) {
+        for (const rating of response.data[0]?.age_ratings) {
+          if (rating.category === 1) {
+            ratingOfGame = parseRating(rating.rating)
+            ratingEnum = rating.rating
+          }
         }
       }
 
-      // const genreIds = response.data[0].genres.map((genre) => genre.id)
-      // const genres = response.data[0].genres.map((genre) => genre.name)
 
       const newGuessData = gameData.guessData[day]
       newGuessData.push(({
@@ -99,10 +102,9 @@ const GameContainer = () => {
         raw: response.data[0],
         releaseDate: releaseDateOfGame,
         rating: ratingOfGame,
-        ratingEnum: response.data[0].age_ratings[0].rating,
-        genres: response.data[0].genres
-        // genreIds: genreIds,
-        // genres: genres
+        ratingEnum: ratingEnum,
+        genres: response.data[0].genres,
+        platforms: response.data[0].platforms
       }))
       setGameData({...gameData, guessData: {[day]: newGuessData}}, writeResultsData(gameData.guessData[day][gameData.guessData[day].length - 1], gameData.answerData))
       setGuess('');
@@ -130,10 +132,17 @@ const GameContainer = () => {
       // console.log(response.data)
 
       const releaseDateOfGame = Number(new Date(response.data[0].first_release_date * 1000).toLocaleDateString("en-us").slice(-4))
-      //check to see if ratingOfGame remains accurate through debugging, otherwise make an algorithm to only select the one that has category = 0 (esrb category)
-      const ratingOfGame = parseRating(response.data[0].age_ratings[0].rating)
-      // const genreIds = response.data[0].genres.map((genre) => genre.id)
-      // const genres = response.data[0].genres.map((genre) => genre.name)
+
+      let ratingOfGame = null;
+      let ratingEnum = null;
+      if (response.data[0].age_ratings) {
+        for (const rating of response.data[0]?.age_ratings) {
+          if (rating.category === 1) {
+            ratingOfGame = parseRating(rating.rating)
+            ratingEnum = rating.rating
+          }
+        }
+      }
 
       setGameData({
         ...gameData,
@@ -142,10 +151,9 @@ const GameContainer = () => {
           releaseDate: releaseDateOfGame,
           gameName: response.data[0].name,
           rating: ratingOfGame,
-          ratingEnum: response.data[0].age_ratings[0].rating,
-          genres: response.data[0].genres
-          // genreIds: genreIds,
-          // genres: genres
+          ratingEnum: ratingEnum,
+          genres: response.data[0].genres,
+          platforms: response.data[0].platforms
         }  
       })
     })
@@ -169,7 +177,11 @@ const GameContainer = () => {
       result.year = `${guess.releaseDate}: ❌ Too old`
     };
     //compare ESRB rating
-    if (guess.ratingEnum === answer.ratingEnum) {
+    if (guess.ratingEnum === null && answer.ratingEnum === null) {
+      result.rating = `Unrated: ✅ Both games are unrated`
+    } else if (guess.ratingEnum === null && answer.ratingEnum !== null) {
+      result.rating = `Unrated: ❌ The target game is rated on the ESRB`
+    } else if(guess.ratingEnum === answer.ratingEnum) {
       result.rating = `${guess.rating}: ✅ Same rating`
     } else if (guess.ratingEnum > answer.ratingEnum) {
       result.rating = `${guess.rating}: ❌ Too mature`
@@ -178,16 +190,28 @@ const GameContainer = () => {
     };
 
     //compare genres
-    //returned undefined when searching minecraft
-    const genreComparisons =  guess.genres.map((genre) => {
+    const genreMatches = []
+    for (const genre of guess.genres) {
       if (answer.genres.find(answerId => answerId.id === genre.id)) {
-        return genre.name
-      } else {
-        return 'bluhhhh' //this must be fixed in the future, map returns undefined for every element it maps over
+        genreMatches.push(genre.name)
       }
-    });
+    }
 
-    result.genres = genreComparisons;
+    //compare platforms
+    const platformMatches = []
+    for (const platform of guess.platforms) {
+      if (answer.platforms.find(answerId => answerId.id === platform.id)) {
+        platformMatches.push(platform.abbreviation)
+      }
+    }
+
+    //writes genre data
+    genreMatches.length > 0 ? result.genres = genreMatches : result.genres = 'No genre matches';
+
+    //writes platform data
+    platformMatches.length > 0 ? result.platforms = platformMatches : result.platforms = 'No platform matches';
+
+    
     //push that results object to gameData through setGameData by correctly spreading the information
     console.log(result)
     //setGameData(...gameData, resultsData[day]: result)
