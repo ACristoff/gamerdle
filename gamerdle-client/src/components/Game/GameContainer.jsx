@@ -13,7 +13,7 @@ import { TextField, Button } from '@material-ui/core';
 //Spread the information correctly only into GuessData and deprecate guesses DONE
 //Consider unifying the state data for all the game data into one DONE
 
-//Rating parsing errors out when there is no age_rating category
+//get data errors out when there is no age_rating category
 
 //Set up error handling for when no game comes up from the search
   //Quick and dirty console.warn DONE
@@ -96,7 +96,7 @@ const GameContainer = () => {
   const getGuessData = async (guessedGame) => {
     // below commented code is for using /search/ instead of /games/ which seems to be less accurate (?)
     // const bodyData = `search "${guessedGame}"; fields alternative_name,character,checksum,collection,company,description,game,name,platform,published_at,test_dummy,theme;`
-    const bodyData = `search "${guessedGame}"; fields *, age_ratings.*, involved_companies.*, involved_companies.company.*, genres.*; limit 1;`
+    const bodyData = `search "${guessedGame}"; fields *, age_ratings.*, game_modes.*, involved_companies.*, involved_companies.company.*, genres.*, player_perspectives.*, platforms.*, cover.*, artworks.*; where version_parent = null; limit 1;`
     
     axios({
       method: 'POST',
@@ -109,7 +109,7 @@ const GameContainer = () => {
       },
       data: bodyData
     }).then(response => {
-      // console.log(response.data)
+      console.log(response.data)
       //basic error handling if no game comes up
       if (response.data[0] === undefined) {
         console.warn('no game found')
@@ -124,7 +124,9 @@ const GameContainer = () => {
           ratingOfGame = parseRating(rating.rating)
         }
       }
-      // const ratingOfGame = parseRating(response.data[0]?.age_ratings[0]?.rating)
+
+      // const genreIds = response.data[0].genres.map((genre) => genre.id)
+      // const genres = response.data[0].genres.map((genre) => genre.name)
 
       const newGuessData = gameData.guessData[day]
       newGuessData.push(({
@@ -132,7 +134,10 @@ const GameContainer = () => {
         raw: response.data[0],
         releaseDate: releaseDateOfGame,
         rating: ratingOfGame,
-        ratingEnum: response.data[0].age_ratings[0].rating
+        ratingEnum: response.data[0].age_ratings[0].rating,
+        genres: response.data[0].genres
+        // genreIds: genreIds,
+        // genres: genres
       }))
       setGameData({...gameData, guessData: {[day]: newGuessData}}, writeResultsData(gameData.guessData[day][gameData.guessData[day].length - 1], gameData.answerData))
       setGuess('');
@@ -143,7 +148,7 @@ const GameContainer = () => {
   }
 
   const getAnswerData = async () => {
-    const bodyData = `search "dark souls"; fields *, age_ratings.*, involved_companies.*, involved_companies.company.*, genres.*; limit 1;`
+    const bodyData = `search "dark souls"; fields *, age_ratings.*, game_modes.*, involved_companies.*, involved_companies.company.*, genres.*, player_perspectives.*, platforms.*, cover.*, artworks.*; where version_parent = null; limit 1;`
     // Example query for /games/ endpoint
     // `search "nier"; fields *; limit 10;`
     // where version_parent = null
@@ -162,6 +167,8 @@ const GameContainer = () => {
       const releaseDateOfGame = Number(new Date(response.data[0].first_release_date * 1000).toLocaleDateString("en-us").slice(-4))
       //check to see if ratingOfGame remains accurate through debugging, otherwise make an algorithm to only select the one that has category = 0 (esrb category)
       const ratingOfGame = parseRating(response.data[0].age_ratings[0].rating)
+      // const genreIds = response.data[0].genres.map((genre) => genre.id)
+      // const genres = response.data[0].genres.map((genre) => genre.name)
 
       setGameData({
         ...gameData,
@@ -170,7 +177,10 @@ const GameContainer = () => {
           releaseDate: releaseDateOfGame,
           gameName: response.data[0].name,
           rating: ratingOfGame,
-          ratingEnum: response.data[0].age_ratings[0].rating
+          ratingEnum: response.data[0].age_ratings[0].rating,
+          genres: response.data[0].genres
+          // genreIds: genreIds,
+          // genres: genres
         }  
       })
     })
@@ -181,8 +191,9 @@ const GameContainer = () => {
 
   const writeResultsData = (guess, answer) => {
     //write a results object
-    const result = {}
+    const result = {};
     //compare guess and answer
+
     //compare release date
     //there has to be a more elegant solution than this
     if (guess.releaseDate === answer.releaseDate) {
@@ -191,16 +202,26 @@ const GameContainer = () => {
       result.year = `${guess.releaseDate}: ❌ Too new`
     } else {
       result.year = `${guess.releaseDate}: ❌ Too old`
-    }
-
+    };
+    //compare ESRB rating
     if (guess.ratingEnum === answer.ratingEnum) {
       result.rating = `${guess.rating}: ✅ Same rating`
     } else if (guess.ratingEnum > answer.ratingEnum) {
       result.rating = `${guess.rating}: ❌ Too mature`
     } else {
       result.rating = `${guess.rating}: ❌ Not mature enough`
-    }
+    };
 
+    //returned undefined when searching minecraft
+    const genreComparisons =  guess.genres.map((genre) => {
+      if (answer.genres.find(answerId => answerId.id === genre.id)) {
+        return genre.name
+      } else {
+        return 'bluhhhh' //this must be fixed in the future, map returns undefined for every element it maps over
+      }
+    });
+
+    result.genres = genreComparisons;
     //push that results object to gameData through setGameData by correctly spreading the information
     console.log(result)
   }
