@@ -3,46 +3,11 @@ import axios from 'axios';
 
 import { TextField, Button } from '@material-ui/core';
 
-//OPTIONAL: This can just be set up manually so that each day just has a predetermined manually selected game to select.
-//set up an algorithm for designating the day's puzzle using local time date
-//only {games} in the top 300
-
-//Set up a manual library of answers for people to play for
-
-//Spread the information correctly into answerData and pull from it DONE
-//Spread the information correctly only into GuessData and deprecate guesses DONE
-//Consider unifying the state data for all the game data into one DONE
-
-//get data errors out when there is no age_rating category
-
-//Set up error handling for when no game comes up from the search
-  //Quick and dirty console.warn DONE
-  //Warn the user on the front-end when search comes up empty
 
 //Edge case: Doom produces a rerelease of doom rather than the original copy of doom 1993
 //Possible solution: Pull the top 5 results from the /games endpoint and sort by rating then write the top one to guessData
   //Possible problem: what if that messes with another answer/guess combination? Must test further
 //
-
-//set up proper error reporting through console.error console.alert and time the amount of time it takes to make requests using console.time
-
-//comparison logic for correct information relating to the answer from the guess data, this requires proper spreading from above tasks
-//eg release date year, ESRB rating, developer, game platform
-
-//rendering for guess data DONE
-
-//Save guess data to local storage
-  //pull guess data from local storage
-//
-
-//share results as a series of emojis and a link to the website
-
-//Fail state
-  //Show answer upon failure DONE
-  //Prevent new submissions once fail state has been reached
-//Success state
-
-//___
 
 //future stuff: connecting to different API's for movies, books, tv shows, anime
 
@@ -212,6 +177,7 @@ const GameContainer = () => {
       result.rating = `${guess.rating}: ❌ Not mature enough`
     };
 
+    //compare genres
     //returned undefined when searching minecraft
     const genreComparisons =  guess.genres.map((genre) => {
       if (answer.genres.find(answerId => answerId.id === genre.id)) {
@@ -224,6 +190,7 @@ const GameContainer = () => {
     result.genres = genreComparisons;
     //push that results object to gameData through setGameData by correctly spreading the information
     console.log(result)
+    //setGameData(...gameData, resultsData[day]: result)
   }
   
   //deprecate this by making an atomic function capable of spitting out correctly formatted html
