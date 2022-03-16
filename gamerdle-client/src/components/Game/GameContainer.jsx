@@ -109,7 +109,7 @@ const GameContainer = () => {
       },
       data: bodyData
     }).then(response => {
-      console.log(response.data)
+      // console.log(response.data)
       //basic error handling if no game comes up
       if (response.data[0] === undefined) {
         console.warn('no game found')
@@ -117,8 +117,14 @@ const GameContainer = () => {
         return
       }
       const releaseDateOfGame = Number(new Date(response.data[0].first_release_date * 1000).toLocaleDateString("en-us").slice(-4))
-      //check to see if ratingOfGame remains accurate through debugging, otherwise make an algorithm to only select the one that has category = 0 (esrb category)
-      const ratingOfGame = parseRating(response.data[0]?.age_ratings[0]?.rating)
+      //check to see if ratingOfGame remains accurate through debugging, otherwise make an algorithm to only select the one that has category = 0 (esrb category) DONE
+      let ratingOfGame = null;
+      for (const rating of response.data[0]?.age_ratings) {
+        if (rating.category === 1) {
+          ratingOfGame = parseRating(rating.rating)
+        }
+      }
+      // const ratingOfGame = parseRating(response.data[0]?.age_ratings[0]?.rating)
 
       const newGuessData = gameData.guessData[day]
       newGuessData.push(({
@@ -128,7 +134,7 @@ const GameContainer = () => {
         rating: ratingOfGame,
         ratingEnum: response.data[0].age_ratings[0].rating
       }))
-      setGameData({...gameData, guessData: {[day]: newGuessData}}, console.log('test'))
+      setGameData({...gameData, guessData: {[day]: newGuessData}}, writeResultsData(gameData))
       setGuess('');
     })
     .catch (error => {
@@ -172,7 +178,15 @@ const GameContainer = () => {
       console.log(error)
     })
   }
+
+  const writeResultsData = (data) => {
+    // console.log('data is: ',data)
+    //compare guess and answer
+    //write a results object
+    //push that results object to gameData through setGameData by correctly spreading the information
+  }
   
+  //deprecate this by making an atomic function capable of spitting out correctly formatted html
   const compareYear = (currentGuess, answer) => {
     // console.log(currentGuess, answer)
     if (currentGuess.releaseDate === answer.releaseDate) {
@@ -222,7 +236,6 @@ const GameContainer = () => {
     }
     return esrbRating
   }
-
 
   useEffect(() => {
     if (!token) {
