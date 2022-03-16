@@ -13,6 +13,8 @@ import { TextField, Button } from '@material-ui/core';
 //Spread the information correctly only into GuessData and deprecate guesses DONE
 //Consider unifying the state data for all the game data into one DONE
 
+//Rating parsing errors out when there is no age_rating category
+
 //Set up error handling for when no game comes up from the search
   //Quick and dirty console.warn DONE
   //Warn the user on the front-end when search comes up empty
@@ -115,7 +117,8 @@ const GameContainer = () => {
         return
       }
       const releaseDateOfGame = Number(new Date(response.data[0].first_release_date * 1000).toLocaleDateString("en-us").slice(-4))
-      const ratingOfGame = parseRating(response.data[0].age_ratings[0].rating)
+      //check to see if ratingOfGame remains accurate through debugging, otherwise make an algorithm to only select the one that has category = 0 (esrb category)
+      const ratingOfGame = parseRating(response.data[0]?.age_ratings[0]?.rating)
 
       const newGuessData = gameData.guessData[day]
       newGuessData.push(({
@@ -125,7 +128,7 @@ const GameContainer = () => {
         rating: ratingOfGame,
         ratingEnum: response.data[0].age_ratings[0].rating
       }))
-      setGameData({...gameData, guessData: {[day]: newGuessData}})
+      setGameData({...gameData, guessData: {[day]: newGuessData}}, console.log('test'))
       setGuess('');
     })
     .catch (error => {
@@ -247,7 +250,6 @@ const GameContainer = () => {
       </div>
     
       <div className='guessSubmission' style={{marginTop: '2em'}}>
-       {/* Guess Input: {guess} */}
        <form autoComplete='off' noValidate className='guessForm' onSubmit={handleGuessSubmit}>
          <TextField placeholder='Guess a random game!' className='guessInput' onChange={(e) => setGuess(e.target.value)} value={guess}/>
          <Button variant='contained' style={{marginTop: '20px'}} type="submit">
