@@ -96,7 +96,7 @@ const GameContainer = () => {
   const getGuessData = async (guessedGame) => {
     // below commented code is for using /search/ instead of /games/ which seems to be less accurate (?)
     // const bodyData = `search "${guessedGame}"; fields alternative_name,character,checksum,collection,company,description,game,name,platform,published_at,test_dummy,theme;`
-    const bodyData = `search "${guessedGame}"; fields *, age_ratings.*; limit 1;`
+    const bodyData = `search "${guessedGame}"; fields *, age_ratings.*, involved_companies.*, involved_companies.company.*; limit 1;`
     
     axios({
       method: 'POST',
@@ -134,7 +134,7 @@ const GameContainer = () => {
         rating: ratingOfGame,
         ratingEnum: response.data[0].age_ratings[0].rating
       }))
-      setGameData({...gameData, guessData: {[day]: newGuessData}}, writeResultsData(gameData))
+      setGameData({...gameData, guessData: {[day]: newGuessData}}, writeResultsData(gameData.guessData[day][gameData.guessData[day].length - 1], gameData.answerData))
       setGuess('');
     })
     .catch (error => {
@@ -179,11 +179,23 @@ const GameContainer = () => {
     })
   }
 
-  const writeResultsData = (data) => {
-    // console.log('data is: ',data)
-    //compare guess and answer
+  const writeResultsData = (guess, answer) => {
     //write a results object
+    const result = {}
+    //compare guess and answer
+    //compare release date
+    //there has to be a more elegant solution than this
+    if (guess.releaseDate === answer.releaseDate) {
+      result.year = `${guess.releaseDate}: ✅ Same Year`
+    } else if (guess.releaseDate > answer.releaseDate) {
+      result.year = `${guess.releaseDate}: ❌ Too new`
+    } else {
+      result.year = `${guess.releaseDate}: ❌ Too old`
+    }
+
+
     //push that results object to gameData through setGameData by correctly spreading the information
+    console.log(result)
   }
   
   //deprecate this by making an atomic function capable of spitting out correctly formatted html
@@ -213,6 +225,9 @@ const GameContainer = () => {
   const parseRating = (rating) => {
     let esrbRating = null;
     switch (rating) {
+      case 6:
+        esrbRating = 'RP'
+        break;
       case 7:
         esrbRating = 'EC'
         break;
