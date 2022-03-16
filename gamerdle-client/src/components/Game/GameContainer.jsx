@@ -114,7 +114,7 @@ const GameContainer = () => {
       }
 
       const releaseDateOfGame = Number(new Date(response.data[0].first_release_date * 1000).toLocaleDateString("en-us").slice(-4))
-      console.log(new Date(response.data[0].first_release_date * 1000).toLocaleDateString("en-us"))
+
       const newGuessData = gameData.guessData[day]
       newGuessData.push(({
         guessName: response.data[0].name, 
@@ -128,11 +128,12 @@ const GameContainer = () => {
       console.log(error)
     });
   }
-  
+
   const getAnswerData = async () => {
-    const bodyData = `search "dark souls"; fields *; limit 1;`
+    const bodyData = `search "dark souls"; fields *, age_ratings.*; limit 1;`
     // Example query for /games/ endpoint
     // `search "nier"; fields *; limit 10;`
+    // where version_parent = null
     axios({
       method: 'POST',
       url: `${CORS_ANYWHERE_URL}/${API_URL}/games/`,
@@ -145,7 +146,11 @@ const GameContainer = () => {
     }).then(response => {
       // console.log(response.data)
 
-      const releaseDateOfGame = Number(new Date(response.data[0].first_release_date * 1000).toLocaleString("en-US").slice(5,9))
+      const releaseDateOfGame = Number(new Date(response.data[0].first_release_date * 1000).toLocaleDateString("en-us").slice(-4))
+      //check to see if ratingOfGame remains accurate through debugging, otherwise make an algorithm to only select the one that has category = 0 (esrb category)
+      const ratingOfGame = parseRating(response.data[0].age_ratings[0].rating)
+
+
       setGameData({
         ...gameData,
         answerData: {
@@ -159,27 +164,59 @@ const GameContainer = () => {
       console.log(error)
     })
   }
-
-  // const compareData = (currentGuess, answer) => {
-  //   if (currentGuess.guessName === answer.gameName) {
-  //     // ??? how should I implement a success state
-  //   }
-
-  //   return (
-  //     <div></div>
-  //   )
-  // }
   
   const compareYear = (currentGuess, answer) => {
     // console.log(currentGuess, answer)
     if (currentGuess?.releaseDate === answer?.releaseDate) {
       return (
         <div>
-          ✅
+          ✅ Same Year
+        </div>
+      )
+    } else if (currentGuess?.releaseDate > answer?.releaseDate) {
+      return (
+        <div>
+          ❌ Too new
+        </div>
+      )
+    } else {
+      return (
+        <div>
+          ❌ Too old
         </div>
       )
     }
   }
+
+  const parseRating = (rating) => {
+    let esrbRating = null;
+    switch (rating) {
+      case 7:
+        esrbRating = 'EC'
+        break;
+      case 8:
+        esrbRating = 'E'
+        break;
+      case 9:
+        esrbRating = 'E10'
+        break;
+      case 10:
+        esrbRating = 'T'
+        break;
+      case 11:
+        esrbRating = 'M'
+        break;
+      case 12:
+        esrbRating = 'AO'
+        break;
+      default:
+        console.warn('No rating found')
+    }
+    console.log(esrbRating, rating)
+    return esrbRating
+  }
+
+  //   data: "fields category,checksum,content_descriptions,rating,rating_cover_url,synopsis;"
 
 
   useEffect(() => {
@@ -196,14 +233,10 @@ const GameContainer = () => {
 
   return (
     <div>
-      <div className='answerData'>
-        Answer: {gameData.answerData.gameName ? gameData.answerData.gameName : 'null'} <br></br>
-        Release Date: {gameData.answerData.releaseDate}
-      </div>
       <div className='guessData'>
-        current guessData: {gameData.guessData[day][gameData.guessData[day].length - 1] ? gameData.guessData[day][gameData.guessData[day].length - 1].guessName : 'empty'}
+        {/* current guessData: {gameData.guessData[day][gameData.guessData[day].length - 1] ? gameData.guessData[day][gameData.guessData[day].length - 1].guessName : 'empty'} */}
         <div className={gameData.guessData[day][0] ? 'GuessAnalysis' : 'BlankGuess'}>{gameData.guessData[day][0]?.guessName} {gameData.guessData[day][0]?.releaseDate} {gameData.guessData[day][0] ? compareYear(gameData.guessData[day][0], gameData.answerData) : null}</div>
-        <div className={gameData.guessData[day][1] ? 'GuessAnalysis' : 'BlankGuess'}>{gameData.guessData[day][1]?.guessName}</div>
+        <div className={gameData.guessData[day][1] ? 'GuessAnalysis' : 'BlankGuess'}>{gameData.guessData[day][1]?.guessName} {gameData.guessData[day][1]?.releaseDate} {gameData.guessData[day][1] ? compareYear(gameData.guessData[day][1], gameData.answerData) : null}</div>
         <div className={gameData.guessData[day][2] ? 'GuessAnalysis' : 'BlankGuess'}>{gameData.guessData[day][2]?.guessName}</div>
         <div className={gameData.guessData[day][3] ? 'GuessAnalysis' : 'BlankGuess'}>{gameData.guessData[day][3]?.guessName}</div>
         <div className={gameData.guessData[day][4] ? 'GuessAnalysis' : 'BlankGuess'}>{gameData.guessData[day][4]?.guessName}</div>
