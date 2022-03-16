@@ -34,7 +34,8 @@ import { TextField, Button } from '@material-ui/core';
 //share results as a series of emojis and a link to the website
 
 //Fail state
-  //Show answer upon failure
+  //Show answer upon failure DONE
+  //Prevent new submissions once fail state has been reached
 //Success state
 
 //___
@@ -44,6 +45,8 @@ import { TextField, Button } from '@material-ui/core';
 const GameContainer = () => {
   const client_ID = process.env.REACT_APP_CLIENT_ID;
   const client_SECRET = process.env.REACT_APP_CLIENT_SECRET;
+  const CORS_ANYWHERE_URL = 'https://acristoff-cors-anywhere.herokuapp.com'
+  const API_URL = 'https://api.igdb.com/v4'
   const [token, setToken] = useState('');
   const [guess, setGuess] = useState('');
 
@@ -66,10 +69,6 @@ const GameContainer = () => {
   //sample answerData
   //{}
 
-  
-
-  const CORS_ANYWHERE_URL = 'https://acristoff-cors-anywhere.herokuapp.com'
-  const API_URL = 'https://api.igdb.com/v4'
 
   const handleGuessSubmit = (e) => {
     e.preventDefault();
@@ -106,8 +105,16 @@ const GameContainer = () => {
       },
       data: bodyData
     }).then(response => {
-      // console.log(response.data)
-      const releaseDateOfGame = Number(new Date(response.data[0].first_release_date * 1000).toLocaleString("en-US").slice(5,9))
+      console.log(response.data)
+      //basic error handling if no game comes up
+      if (response.data[0] === undefined) {
+        console.warn('no game found')
+        setGuess('');
+        return
+      }
+
+      const releaseDateOfGame = Number(new Date(response.data[0].first_release_date * 1000).toLocaleDateString("en-us").slice(-4))
+      console.log(new Date(response.data[0].first_release_date * 1000).toLocaleDateString("en-us"))
       const newGuessData = gameData.guessData[day]
       newGuessData.push(({
         guessName: response.data[0].name, 
@@ -121,7 +128,7 @@ const GameContainer = () => {
       console.log(error)
     });
   }
-
+  
   const getAnswerData = async () => {
     const bodyData = `search "dark souls"; fields *; limit 1;`
     // Example query for /games/ endpoint
@@ -137,6 +144,7 @@ const GameContainer = () => {
       data: bodyData
     }).then(response => {
       // console.log(response.data)
+
       const releaseDateOfGame = Number(new Date(response.data[0].first_release_date * 1000).toLocaleString("en-US").slice(5,9))
       setGameData({
         ...gameData,
@@ -151,6 +159,28 @@ const GameContainer = () => {
       console.log(error)
     })
   }
+
+  // const compareData = (currentGuess, answer) => {
+  //   if (currentGuess.guessName === answer.gameName) {
+  //     // ??? how should I implement a success state
+  //   }
+
+  //   return (
+  //     <div></div>
+  //   )
+  // }
+  
+  const compareYear = (currentGuess, answer) => {
+    // console.log(currentGuess, answer)
+    if (currentGuess?.releaseDate === answer?.releaseDate) {
+      return (
+        <div>
+          ✅
+        </div>
+      )
+    }
+  }
+
 
   useEffect(() => {
     if (!token) {
@@ -172,16 +202,17 @@ const GameContainer = () => {
       </div>
       <div className='guessData'>
         current guessData: {gameData.guessData[day][gameData.guessData[day].length - 1] ? gameData.guessData[day][gameData.guessData[day].length - 1].guessName : 'empty'}
-        <div className={gameData.guessData[day][0] ? 'GuessAnalysis' : 'BlankGuess'}>{gameData.guessData[day][0]?.guessName}</div>
+        <div className={gameData.guessData[day][0] ? 'GuessAnalysis' : 'BlankGuess'}>{gameData.guessData[day][0]?.guessName} {gameData.guessData[day][0]?.releaseDate} {gameData.guessData[day][0] ? compareYear(gameData.guessData[day][0], gameData.answerData) : null}</div>
         <div className={gameData.guessData[day][1] ? 'GuessAnalysis' : 'BlankGuess'}>{gameData.guessData[day][1]?.guessName}</div>
         <div className={gameData.guessData[day][2] ? 'GuessAnalysis' : 'BlankGuess'}>{gameData.guessData[day][2]?.guessName}</div>
         <div className={gameData.guessData[day][3] ? 'GuessAnalysis' : 'BlankGuess'}>{gameData.guessData[day][3]?.guessName}</div>
         <div className={gameData.guessData[day][4] ? 'GuessAnalysis' : 'BlankGuess'}>{gameData.guessData[day][4]?.guessName}</div>
         <div className={gameData.guessData[day][5] ? 'GuessAnalysis' : 'BlankGuess'}>{gameData.guessData[day][5]?.guessName}</div>
+        <div>{gameData.guessData[day][6] ? `The answer is: ${gameData.answerData.gameName}` : null}</div>
       </div>
     
       <div className='guessSubmission' style={{marginTop: '2em'}}>
-       GuessInput: {guess}
+       {/* Guess Input: {guess} */}
        <form autoComplete='off' noValidate className='guessForm' onSubmit={handleGuessSubmit}>
          <TextField placeholder='Guess a random game!' className='guessInput' onChange={(e) => setGuess(e.target.value)} value={guess}/>
          <Button variant='contained' style={{marginTop: '20px'}} type="submit">
