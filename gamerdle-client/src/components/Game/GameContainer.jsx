@@ -104,7 +104,9 @@ const GameContainer = () => {
         rating: ratingOfGame,
         ratingEnum: ratingEnum,
         genres: response.data[0].genres,
-        platforms: response.data[0].platforms
+        platforms: response.data[0].platforms,
+        playerPerspectives: response.data[0].player_perspectives,
+        involvedCompanies: response.data[0].involved_companies
       }))
       setGameData({...gameData, guessData: {[day]: newGuessData}}, writeResultsData(gameData.guessData[day][gameData.guessData[day].length - 1], gameData.answerData))
       setGuess('');
@@ -153,7 +155,9 @@ const GameContainer = () => {
           rating: ratingOfGame,
           ratingEnum: ratingEnum,
           genres: response.data[0].genres,
-          platforms: response.data[0].platforms
+          platforms: response.data[0].platforms,
+          playerPerspectives: response.data[0].player_perspectives,
+          involvedCompanies: response.data[0].involved_companies
         }  
       })
     })
@@ -190,18 +194,41 @@ const GameContainer = () => {
     };
 
     //compare genres
+    //There has to be a better solution than this
     const genreMatches = []
-    for (const genre of guess.genres) {
-      if (answer.genres.find(answerId => answerId.id === genre.id)) {
-        genreMatches.push(genre.name)
+    if (guess.genres) {
+      for (const genre of guess.genres) {
+        if (answer.genres.find(answerId => answerId.id === genre.id)) {
+          genreMatches.push(genre.name)
+        }
       }
     }
 
     //compare platforms
     const platformMatches = []
-    for (const platform of guess.platforms) {
-      if (answer.platforms.find(answerId => answerId.id === platform.id)) {
-        platformMatches.push(platform.abbreviation)
+    if (guess.platforms) {
+      for (const platform of guess.platforms) {
+        if (answer.platforms.find(answerId => answerId.id === platform.id)) {
+          platformMatches.push(platform.abbreviation)
+        }
+      }
+    }
+
+    //compare perspectives
+    const perspectiveMatches = []
+    if (guess.perspectives) {
+      for (const perspective of guess.playerPerspectives) {
+        if (answer.playerPerspectives.find(answerId => answerId.id === perspective.id)) {
+          perspectiveMatches.push(perspective.name)
+        }
+      }
+    }
+
+    //compare companies
+    const companyMatches = []
+    for (const company of guess.involvedCompanies) {
+      if (answer.involvedCompanies.find(answerId => answerId.company.id === company.company.id)) {
+        companyMatches.push(company.company.name)
       }
     }
 
@@ -211,10 +238,23 @@ const GameContainer = () => {
     //writes platform data
     platformMatches.length > 0 ? result.platforms = platformMatches : result.platforms = 'No platform matches';
 
+    //writes perspective data
+    perspectiveMatches.length > 0 ? result.perspectives = perspectiveMatches : result.perspectives = 'No perspective matches';
+
+    //write company data
+    companyMatches.length > 0 ? result.companies = companyMatches : result.companies = 'No company matches';
+
+    // console.log(guess.guessName === answer.gameName)
+
+    guess.guessName === answer.gameName ? result.correct = true : result.correct = false;
+
+    result.guess = guess.guessName
     
     //push that results object to gameData through setGameData by correctly spreading the information
-    console.log(result)
-    //setGameData(...gameData, resultsData[day]: result)
+    // console.log(result)
+    const newResultsData = gameData.resultsData[day]
+    newResultsData.push(result)
+    setGameData({...gameData, resultsData: {[day]: newResultsData}})
   }
   
   //deprecate this by making an atomic function capable of spitting out correctly formatted html
@@ -280,22 +320,36 @@ const GameContainer = () => {
   }, [token]);
 
   useEffect(() => {
+    checkSuccess()
     console.log(gameData)
   }, [gameData])
+
+  const checkSuccess = () => {
+    //there must be a better way to check the last element of an array
+    if (gameData.resultsData[day].length > 0) {
+      console.log(gameData.resultsData[day][gameData.resultsData[day].length - 1].correct)
+      return gameData.resultsData[day][gameData.resultsData[day].length - 1].correct
+    }
+    return false
+  }
 
   return (
     <div>
       <div className='guessData'>
         {/* current guessData: {gameData.guessData[day][gameData.guessData[day].length - 1] ? gameData.guessData[day][gameData.guessData[day].length - 1].guessName : 'empty'} */}
-        <div className={gameData.guessData[day][0] ? 'GuessAnalysis' : 'BlankGuess'}>{gameData.guessData[day][0]?.guessName} {gameData.guessData[day][0] ? compareYear(gameData.guessData[day][0], gameData.answerData) : null}</div>
+        {/* <div className={gameData.guessData[day][0] ? 'GuessAnalysis' : 'BlankGuess'}>{gameData.guessData[day][0]?.guessName} {gameData.guessData[day][0] ? compareYear(gameData.guessData[day][0], gameData.answerData) : null}</div>
         <div className={gameData.guessData[day][1] ? 'GuessAnalysis' : 'BlankGuess'}>{gameData.guessData[day][1]?.guessName} {gameData.guessData[day][1] ? compareYear(gameData.guessData[day][1], gameData.answerData) : null}</div>
         <div className={gameData.guessData[day][2] ? 'GuessAnalysis' : 'BlankGuess'}>{gameData.guessData[day][2]?.guessName}</div>
         <div className={gameData.guessData[day][3] ? 'GuessAnalysis' : 'BlankGuess'}>{gameData.guessData[day][3]?.guessName}</div>
         <div className={gameData.guessData[day][4] ? 'GuessAnalysis' : 'BlankGuess'}>{gameData.guessData[day][4]?.guessName}</div>
-        <div className={gameData.guessData[day][5] ? 'GuessAnalysis' : 'BlankGuess'}>{gameData.guessData[day][5]?.guessName}</div>
-        <div>{gameData.guessData[day][6] ? `The answer is: ${gameData.answerData.gameName}` : null}</div>
+        <div className={gameData.guessData[day][5] ? 'GuessAnalysis' : 'BlankGuess'}>{gameData.guessData[day][5]?.guessName}</div> */}
+        <div>{checkSuccess() && (
+          <>Success! The answer was {gameData.answerData.gameName} ({gameData.answerData.releaseDate})</>
+        )}</div>
+        <div>{gameData.guessData[day][5] && checkSuccess() === false  ? `The answer is: ${gameData.answerData.gameName}` : null}</div>
       </div>
-    
+      
+      {}
       <div className='guessSubmission' style={{marginTop: '2em'}}>
        <form autoComplete='off' noValidate className='guessForm' onSubmit={handleGuessSubmit}>
          <TextField placeholder='Guess a random game!' className='guessInput' onChange={(e) => setGuess(e.target.value)} value={guess}/>
