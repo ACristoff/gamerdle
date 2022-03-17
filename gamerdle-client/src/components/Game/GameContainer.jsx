@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
+import gameLibrary from './gameLibrary';
+
 import { TextField, Button } from '@material-ui/core';
 
 
@@ -18,6 +20,9 @@ const GameContainer = () => {
   const API_URL = 'https://api.igdb.com/v4'
   const [token, setToken] = useState('');
   const [guess, setGuess] = useState('');
+
+  //the library of answers
+  const library = gameLibrary;
 
   const day = new Date().toISOString().slice(0, 10);
   const [gameData, setGameData] = useState({
@@ -74,13 +79,14 @@ const GameContainer = () => {
       },
       data: bodyData
     }).then(response => {
-      console.log(response.data)
+      // console.log(response.data)
       //basic error handling if no game comes up
       if (response.data[0] === undefined) {
         console.warn('no game found')
         setGuess('');
         return
       }
+
       const releaseDateOfGame = Number(new Date(response.data[0].first_release_date * 1000).toLocaleDateString("en-us").slice(-4))
       //check to see if ratingOfGame remains accurate through debugging, otherwise make an algorithm to only select the one that has category = 0 (esrb category) DONE
       //implement this into getAnswerData
@@ -94,7 +100,6 @@ const GameContainer = () => {
           }
         }
       }
-
 
       const newGuessData = gameData.guessData[day]
       newGuessData.push(({
@@ -117,7 +122,7 @@ const GameContainer = () => {
   }
 
   const getAnswerData = async () => {
-    const bodyData = `search "dark souls"; fields *, age_ratings.*, game_modes.*, involved_companies.*, involved_companies.company.*, genres.*, player_perspectives.*, platforms.*, cover.*, artworks.*; where version_parent = null; limit 1;`
+    const bodyData = `search "${library[day]}"; fields *, age_ratings.*, game_modes.*, involved_companies.*, involved_companies.company.*, genres.*, player_perspectives.*, platforms.*, cover.*, artworks.*; where version_parent = null; limit 1;`
     // Example query for /games/ endpoint
     // `search "nier"; fields *; limit 10;`
     // where version_parent = null
@@ -233,22 +238,22 @@ const GameContainer = () => {
     }
 
     //writes genre data
-    genreMatches.length > 0 ? result.genres = genreMatches : result.genres = 'No genre matches';
+    genreMatches.length > 0 ? result.genres = genreMatches : result.genres = ['No genre matches'];
 
     //writes platform data
-    platformMatches.length > 0 ? result.platforms = platformMatches : result.platforms = 'No platform matches';
+    platformMatches.length > 0 ? result.platforms = platformMatches : result.platforms = ['No platform matches'];
 
     //writes perspective data
-    perspectiveMatches.length > 0 ? result.perspectives = perspectiveMatches : result.perspectives = 'No perspective matches';
+    perspectiveMatches.length > 0 ? result.perspectives = perspectiveMatches : result.perspectives = ['No perspective matches'];
 
     //write company data
-    companyMatches.length > 0 ? result.companies = companyMatches : result.companies = 'No company matches';
+    companyMatches.length > 0 ? result.companies = companyMatches : result.companies = ['No company matches'];
 
     // console.log(guess.guessName === answer.gameName)
 
     guess.guessName === answer.gameName ? result.correct = true : result.correct = false;
 
-    result.guess = guess.guessName
+    result.guess = guess.guessName;
     
     //push that results object to gameData through setGameData by correctly spreading the information
     // console.log(result)
@@ -327,37 +332,71 @@ const GameContainer = () => {
   const checkSuccess = () => {
     //there must be a better way to check the last element of an array
     if (gameData.resultsData[day].length > 0) {
-      console.log(gameData.resultsData[day][gameData.resultsData[day].length - 1].correct)
+      // console.log(gameData.resultsData[day][gameData.resultsData[day].length - 1].correct)
       return gameData.resultsData[day][gameData.resultsData[day].length - 1].correct
     }
     return false
   }
 
+  const guessRender = (guessResult, i) => {
+    const mapArray = (arr) => {
+      // console.log(arr)
+       return arr.map((element, index, array) => {
+         if (index === array.length -1) {
+           return `${element}`
+         }
+        return `${element}, `
+      })
+    }
+
+    return (
+      <div key={i}>
+        <div>
+          {guessResult.correct ? `✅` : `❌`}  {guessResult.guess}
+        </div>
+        <div>
+          {guessResult.rating}
+        </div>
+        <div>
+          {guessResult.year}
+        </div>
+        <div>
+          Platforms: {mapArray(guessResult.platforms)}
+        </div>
+        <div>
+          Companies: {mapArray(guessResult.companies)}
+        </div>
+        <div>
+          Perspectives: {mapArray(guessResult.perspectives)}
+        </div>
+        <div>
+          Genres: {mapArray(guessResult.genres)}
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div>
       <div className='guessData'>
-        {/* current guessData: {gameData.guessData[day][gameData.guessData[day].length - 1] ? gameData.guessData[day][gameData.guessData[day].length - 1].guessName : 'empty'} */}
-        {/* <div className={gameData.guessData[day][0] ? 'GuessAnalysis' : 'BlankGuess'}>{gameData.guessData[day][0]?.guessName} {gameData.guessData[day][0] ? compareYear(gameData.guessData[day][0], gameData.answerData) : null}</div>
-        <div className={gameData.guessData[day][1] ? 'GuessAnalysis' : 'BlankGuess'}>{gameData.guessData[day][1]?.guessName} {gameData.guessData[day][1] ? compareYear(gameData.guessData[day][1], gameData.answerData) : null}</div>
-        <div className={gameData.guessData[day][2] ? 'GuessAnalysis' : 'BlankGuess'}>{gameData.guessData[day][2]?.guessName}</div>
-        <div className={gameData.guessData[day][3] ? 'GuessAnalysis' : 'BlankGuess'}>{gameData.guessData[day][3]?.guessName}</div>
-        <div className={gameData.guessData[day][4] ? 'GuessAnalysis' : 'BlankGuess'}>{gameData.guessData[day][4]?.guessName}</div>
-        <div className={gameData.guessData[day][5] ? 'GuessAnalysis' : 'BlankGuess'}>{gameData.guessData[day][5]?.guessName}</div> */}
+        {/* {gameData.resultsData[day][0] && guessRender(gameData.resultsData[day][0])} */}
+        {gameData.resultsData[day].map((result, index) => guessRender(result, index))}
         <div>{checkSuccess() && (
           <>Success! The answer was {gameData.answerData.gameName} ({gameData.answerData.releaseDate})</>
         )}</div>
         <div>{gameData.guessData[day][5] && checkSuccess() === false  ? `The answer is: ${gameData.answerData.gameName}` : null}</div>
       </div>
       
-      {}
-      <div className='guessSubmission' style={{marginTop: '2em'}}>
-       <form autoComplete='off' noValidate className='guessForm' onSubmit={handleGuessSubmit}>
-         <TextField placeholder='Guess a random game!' className='guessInput' onChange={(e) => setGuess(e.target.value)} value={guess}/>
-         <Button variant='contained' style={{marginTop: '20px'}} type="submit">
-           Submit Guess
-         </Button>
-       </form>
-     </div>
+      {(!gameData.guessData[day][5] && checkSuccess() === false) && 
+        <div className='guessSubmission' style={{marginTop: '2em'}}>
+          <form autoComplete='off' noValidate className='guessForm' onSubmit={handleGuessSubmit}>
+            <TextField placeholder='Guess a random game!' className='guessInput' onChange={(e) => setGuess(e.target.value)} value={guess}/>
+            <Button variant='contained' style={{marginTop: '20px'}} type="submit">
+              Submit Guess
+            </Button>
+          </form>
+        </div>
+      }
     </div>
   )
 };
