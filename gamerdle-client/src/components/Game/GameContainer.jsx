@@ -262,29 +262,30 @@ const GameContainer = () => {
     setGameData({...gameData, resultsData: {[day]: newResultsData}})
   }
   
+  //DEPRECATED
   //deprecate this by making an atomic function capable of spitting out correctly formatted html
-  const compareYear = (currentGuess, answer) => {
-    // console.log(currentGuess, answer)
-    if (currentGuess.releaseDate === answer.releaseDate) {
-      return (
-        <div>
-          {currentGuess.releaseDate}: ✅ Same Year
-        </div>
-      )
-    } else if (currentGuess.releaseDate > answer.releaseDate) {
-      return (
-        <div>
-          {currentGuess.releaseDate}: ❌ Too new
-        </div>
-      )
-    } else {
-      return (
-        <div>
-          {currentGuess.releaseDate}: ❌ Too old
-        </div>
-      )
-    }
-  }
+  // const compareYear = (currentGuess, answer) => {
+  //   // console.log(currentGuess, answer)
+  //   if (currentGuess.releaseDate === answer.releaseDate) {
+  //     return (
+  //       <div>
+  //         {currentGuess.releaseDate}: ✅ Same Year
+  //       </div>
+  //     )
+  //   } else if (currentGuess.releaseDate > answer.releaseDate) {
+  //     return (
+  //       <div>
+  //         {currentGuess.releaseDate}: ❌ Too new
+  //       </div>
+  //     )
+  //   } else {
+  //     return (
+  //       <div>
+  //         {currentGuess.releaseDate}: ❌ Too old
+  //       </div>
+  //     )
+  //   }
+  // }
 
   const parseRating = (rating) => {
     let esrbRating = null;
