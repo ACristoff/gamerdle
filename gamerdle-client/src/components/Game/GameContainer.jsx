@@ -3,7 +3,7 @@ import axios from 'axios';
 
 import gameLibrary from './gameLibrary';
 
-import { TextField, Button, CircularProgress} from '@material-ui/core';
+import { TextField, Button, CircularProgress, Typography, Paper} from '@material-ui/core';
 
 //Make it so that the autosuggest when clicked, searches for the ID of the given title using a new function getGuessById(id)
 //Make it so that suggestions are displayed as mui components
@@ -402,13 +402,20 @@ const GameContainer = () => {
   }
 
   const autoSuggestionRender = (suggestionArray) => {
-    return suggestionArray.map((element, index) => {
-      return (
-        <div key={index} className='autosuggestions' onClick={(e) => setAutoSuggest({...autoSuggest, suggestId: element.id})}>
-          {element.name} ({element.releaseDate})
-        </div>
-      )
-    })
+    return (
+      <Paper id='autoSuggestContainer' elevation={6}>
+        {suggestionArray.map((element, index) => {
+          return (
+            <div key={index} className='autosuggestion' onClick={(e) => setAutoSuggest({...autoSuggest, suggestId: element.id})}>
+              <Button color='inherit'>
+                {element.name} ({element.releaseDate})
+              </Button>
+            </div>
+          )
+        })}
+      </Paper>
+    )
+
   }
 
   return (

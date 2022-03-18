@@ -37,6 +37,21 @@
 .guessInput {
   color:aliceblue;
 }
+
+.autoSuggestContainer {
+  background-color: #282c34;
+}
+
+.guessSubmissions {
+  max-width: 50%;
+}
+
+#autoSuggestContainer {
+  background-color: #282c34;
+  color: aliceblue;
+  padding: 0.4em;
+  max-width:30vw;
+}
 /* .Footer {
 
 } */
