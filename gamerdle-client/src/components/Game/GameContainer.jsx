@@ -4,9 +4,9 @@ import axios from 'axios';
 import gameLibrary from './gameLibrary';
 
 import { TextField, Button, CircularProgress} from '@material-ui/core';
-// import { Autocomplete } from '@autocomplete/material-ui';
 
-// import Autosuggest from '../Autosuggest/Autosuggest'
+//Make it so that the autosuggest when clicked, searches for the ID of the given title using a new function getGuessById(id)
+//Make it so that suggestions are displayed as mui components
 
 //future stuff: connecting to different API's for movies, books, tv shows, anime
 
@@ -21,7 +21,7 @@ const GameContainer = () => {
     suggestions: [],
     suggestId: ''
   });
-  const [gameId, setGameId] = useState('');
+  // const [gameId, setGameId] = useState('');
   const [open, setOpen] = useState(false)
   const loading = open && autoSuggest.suggestions.length === 0;
 
