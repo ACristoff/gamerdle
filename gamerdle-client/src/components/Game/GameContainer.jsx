@@ -126,6 +126,64 @@ const GameContainer = () => {
     });
   }
 
+  const getGuessDataById = async (id) => {
+    // below commented code is for using /search/ instead of /games/ which seems to be less accurate (?)
+    // const bodyData = `search "${guessedGame}"; fields alternative_name,character,checksum,collection,company,description,game,name,platform,published_at,test_dummy,theme;`
+    const bodyData = `fields *, age_ratings.*, game_modes.*, involved_companies.*, involved_companies.company.*, genres.*, player_perspectives.*, platforms.*, cover.*, artworks.*; where id = ${id}; limit 1;`
+    
+    axios({
+      method: 'POST',
+      // url: `${CORS_ANYWHERE_URL}/${API_URL}/search/`,
+      url: `${CORS_ANYWHERE_URL}/${API_URL}/games/`,
+      headers: {
+        'Accept': 'application/json',
+        'Client-ID': client_ID,
+        'Authorization': `Bearer ${token}`,
+      },
+      data: bodyData
+    }).then(response => {
+      // console.log(response.data)
+      //basic error handling if no game comes up
+      if (response.data[0] === undefined) {
+        console.warn('no game found')
+        setGuess('');
+        return
+      }
+
+      const releaseDateOfGame = Number(new Date(response.data[0].first_release_date * 1000).toLocaleDateString("en-us").slice(-4))
+      //check to see if ratingOfGame remains accurate through debugging, otherwise make an algorithm to only select the one that has category = 0 (esrb category) DONE
+      //implement this into getAnswerData
+      let ratingOfGame = null;
+      let ratingEnum = null;
+      if (response.data[0].age_ratings) {
+        for (const rating of response.data[0]?.age_ratings) {
+          if (rating.category === 1) {
+            ratingOfGame = parseRating(rating.rating)
+            ratingEnum = rating.rating
+          }
+        }
+      }
+
+      const newGuessData = gameData.guessData[day]
+      newGuessData.push(({
+        guessName: response.data[0].name, 
+        raw: response.data[0],
+        releaseDate: releaseDateOfGame,
+        rating: ratingOfGame,
+        ratingEnum: ratingEnum,
+        genres: response.data[0].genres,
+        platforms: response.data[0].platforms,
+        playerPerspectives: response.data[0].player_perspectives,
+        involvedCompanies: response.data[0].involved_companies
+      }))
+      setGameData({...gameData, guessData: {[day]: newGuessData}}, writeResultsData(gameData.guessData[day][gameData.guessData[day].length - 1], gameData.answerData))
+      setGuess('');
+    })
+    .catch (error => {
+      console.log(error)
+    });
+  }
+
   const getSuggestions = async (input) => {
     const bodyData = `search "${input}"; fields name, first_release_date; where version_parent = null; limit 5;`
 
@@ -406,8 +464,8 @@ const GameContainer = () => {
       <Paper id='autoSuggestContainer' elevation={6}>
         {suggestionArray.map((element, index) => {
           return (
-            <div key={index} className='autosuggestion' onClick={(e) => setAutoSuggest({...autoSuggest, suggestId: element.id})}>
-              <Button color='inherit'>
+            <div key={index} className='autosuggestion'>
+              <Button color='inherit' onClick={(e) => getGuessDataById(element.id)}>
                 {element.name} ({element.releaseDate})
               </Button>
             </div>
