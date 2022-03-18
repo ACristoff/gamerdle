@@ -5,10 +5,13 @@ const Footer = () => {
   return (
     <Container className='footer'>
       <Typography>
-        Love this project? Follow me on <Link href="#">twitter</Link> or check out my <Link href="#">portfolio</Link>.
+        Love this project? Buy me a coffee
       </Typography>
       <Typography>
-        Want to offer me a job? Contact me *NOW*.
+        Follow me on <Link href="#">twitter</Link> or check out my <Link href="#">portfolio</Link>.
+      </Typography>
+      <Typography>
+        Want to offer me a job? Contact me <i>NOW</i>.
       </Typography>
     </Container>
   )

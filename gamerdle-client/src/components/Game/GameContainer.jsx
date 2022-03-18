@@ -325,11 +325,14 @@ const GameContainer = () => {
 
     //compare companies
     const companyMatches = []
-    for (const company of guess.involvedCompanies) {
-      if (answer.involvedCompanies.find(answerId => answerId.company.id === company.company.id)) {
-        companyMatches.push(company.company.name)
+    if (guess.involvedCompanies) {
+      for (const company of guess.involvedCompanies) {
+        if (answer.involvedCompanies.find(answerId => answerId.company.id === company.company.id)) {
+          companyMatches.push(company.company.name)
+        }
       }
     }
+
 
     //writes genre data
     genreMatches.length > 0 ? result.genres = genreMatches : result.genres = ['No genre matches'];
