@@ -46,6 +46,21 @@
   max-width: 50%;
 }
 
+.guessData {
+}
+
+/* .guessPaper {
+  padding: 0.4em;
+  background-color: #282c34;
+  color: aliceblue;
+} */
+
+#guessPaperContainer {
+  padding: 0.4em;
+  background-color: #282c34;
+  color: aliceblue;
+}
+
 #autoSuggestContainer {
   background-color: #282c34;
   color: aliceblue;

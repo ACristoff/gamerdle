@@ -3,7 +3,7 @@ import axios from 'axios';
 
 import gameLibrary from './gameLibrary';
 
-import { TextField, Button, CircularProgress, Typography, Paper} from '@material-ui/core';
+import { TextField, Button, CircularProgress, Typography, Paper, Container, ClickAwayListener, Box} from '@material-ui/core';
 
 //Make it so that the autosuggest when clicked, searches for the ID of the given title using a new function getGuessById(id)
 //Make it so that suggestions are displayed as mui components
@@ -185,7 +185,7 @@ const GameContainer = () => {
   }
 
   const getSuggestions = async (input) => {
-    const bodyData = `search "${input}"; fields name, first_release_date; where version_parent = null; limit 5;`
+    const bodyData = `search "${input}"; fields name, first_release_date; where version_parent = null; where category != 1; limit 5;`
 
     axios({
       method: 'POST',
@@ -433,29 +433,31 @@ const GameContainer = () => {
     }
 
     return (
-      <div key={i}>
-        <div>
+      <Paper id='guessPaperContainer' key={i} elevation={6}>
+        <Typography>
           {guessResult.correct ? `✅` : `❌`}  {guessResult.guess}
-        </div>
-        <div>
+        </Typography>
+
+        <Typography>
           {guessResult.rating}
-        </div>
-        <div>
+        </Typography>
+
+        <Typography>
           {guessResult.year}
-        </div>
-        <div>
+        </Typography>
+        <Typography>
           Platforms: {mapArray(guessResult.platforms)}
-        </div>
-        <div>
+        </Typography>
+        <Typography>
           Companies: {mapArray(guessResult.companies)}
-        </div>
-        <div>
+        </Typography>
+        <Typography>
           Perspectives: {mapArray(guessResult.perspectives)}
-        </div>
-        <div>
+        </Typography>
+        <Typography>
           Genres: {mapArray(guessResult.genres)}
-        </div>
-      </div>
+        </Typography>
+    </Paper>
     )
   }
 
@@ -476,8 +478,12 @@ const GameContainer = () => {
 
   }
 
+  const handleClickAway = () => {
+    setOpen(false)
+  }
+
   return (
-    <div>
+    <Container>
       <div className='guessData'>
         {/* {gameData.resultsData[day][0] && guessRender(gameData.resultsData[day][0])} */}
         {gameData.resultsData[day].map((result, index) => guessRender(result, index))}
@@ -489,17 +495,22 @@ const GameContainer = () => {
       {}
       {(!gameData.guessData[day][5] && checkSuccess() === false) && 
         <div className='guessSubmission' style={{marginTop: '2em'}}>
-          <form autoComplete='off' noValidate className='guessForm' onSubmit={handleGuessSubmit}>
-            {loading && <CircularProgress />}
-            {open && autoSuggest.suggestions.length > 0 ? autoSuggestionRender(autoSuggest.suggestions) : null}
-            <TextField placeholder='Guess a random game!' className='guessInput' onChange={(e) => setGuess(e.target.value, {/* setAutoSuggest({...autoSuggest, suggestId: ''}) */})} value={guess}/>
-            <Button variant='contained' style={{marginTop: '20px'}} type="submit">
-              Submit Guess
-            </Button>
-          </form>
+          <ClickAwayListener onClickAway={handleClickAway}>
+            <Box>
+              <form autoComplete='off' noValidate className='guessForm' onSubmit={handleGuessSubmit}>
+              {loading && <CircularProgress />}
+              {open && autoSuggest.suggestions.length > 0 ? autoSuggestionRender(autoSuggest.suggestions) : null}
+              <TextField placeholder='Guess a random game!' className='guessInput' onChange={(e) => setGuess(e.target.value, {/* setAutoSuggest({...autoSuggest, suggestId: ''}) */})} value={guess}/>
+              <Button variant='contained' style={{marginTop: '20px'}} type="submit">
+                Submit Guess
+              </Button>
+              </form>
+            </Box>
+          </ClickAwayListener>
+
         </div>
       }
-    </div>
+    </Container>
   )
 };
 
