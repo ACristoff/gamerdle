@@ -3,13 +3,10 @@ import axios from 'axios';
 
 import gameLibrary from './gameLibrary';
 
-import { TextField, Button } from '@material-ui/core';
+import { TextField, Button, CircularProgress} from '@material-ui/core';
+// import { Autocomplete } from '@autocomplete/material-ui';
 
-
-//Edge case: Doom produces a rerelease of doom rather than the original copy of doom 1993
-//Possible solution: Pull the top 5 results from the /games endpoint and sort by rating then write the top one to guessData
-  //Possible problem: what if that messes with another answer/guess combination? Must test further
-//
+// import Autosuggest from '../Autosuggest/Autosuggest'
 
 //future stuff: connecting to different API's for movies, books, tv shows, anime
 
@@ -20,11 +17,19 @@ const GameContainer = () => {
   const API_URL = 'https://api.igdb.com/v4'
   const [token, setToken] = useState('');
   const [guess, setGuess] = useState('');
+  const [autoSuggest, setAutoSuggest] = useState({
+    suggestions: [],
+    suggestId: ''
+  });
+  const [gameId, setGameId] = useState('');
+  const [open, setOpen] = useState(false)
+  const loading = open && autoSuggest.suggestions.length === 0;
 
   //the library of answers
   const library = gameLibrary;
 
-  const day = new Date().toISOString().slice(0, 10);
+  const tzoffset = (new Date()).getTimezoneOffset() * 60000
+  const day = new Date(Date.now() - tzoffset).toISOString().slice(0, 10);
   const [gameData, setGameData] = useState({
     guessData: {[day]: []},
     answerData: {},
@@ -46,7 +51,7 @@ const GameContainer = () => {
 
   const handleGuessSubmit = (e) => {
     e.preventDefault();
-    getGuessData(guess);
+    getGuessDataByName(guess);
   }
 
   const getToken = async () => {
@@ -63,7 +68,7 @@ const GameContainer = () => {
     }
   };
 
-  const getGuessData = async (guessedGame) => {
+  const getGuessDataByName = async (guessedGame) => {
     // below commented code is for using /search/ instead of /games/ which seems to be less accurate (?)
     // const bodyData = `search "${guessedGame}"; fields alternative_name,character,checksum,collection,company,description,game,name,platform,published_at,test_dummy,theme;`
     const bodyData = `search "${guessedGame}"; fields *, age_ratings.*, game_modes.*, involved_companies.*, involved_companies.company.*, genres.*, player_perspectives.*, platforms.*, cover.*, artworks.*; where version_parent = null; limit 1;`
@@ -119,6 +124,37 @@ const GameContainer = () => {
     .catch (error => {
       console.log(error)
     });
+  }
+
+  const getSuggestions = async (input) => {
+    const bodyData = `search "${input}"; fields name, first_release_date; where version_parent = null; limit 5;`
+
+    axios({
+      method: 'POST',
+      // url: `${CORS_ANYWHERE_URL}/${API_URL}/search/`,
+      url: `${CORS_ANYWHERE_URL}/${API_URL}/games/`,
+      headers: {
+        'Accept': 'application/json',
+        'Client-ID': client_ID,
+        'Authorization': `Bearer ${token}`,
+      },
+      data: bodyData
+    }).then(response => { 
+      // console.log(response.data)
+      // const releaseDateOfGame = Number(new Date(response.data[0].first_release_date * 1000).toLocaleDateString("en-us").slice(-4))
+      const suggestionArray = response.data.map((element) => {
+        const interpretedElement = {
+          name: element.name,
+          id: element.id,
+          releaseDate: Number(new Date(element.first_release_date * 1000).toLocaleDateString("en-us").slice(-4))
+        }
+        return interpretedElement
+      });
+      setAutoSuggest({...autoSuggest, suggestions: suggestionArray}, console.log(autoSuggest))
+    })
+    .catch (error => {
+      console.log(error)
+    })
   }
 
   const getAnswerData = async () => {
@@ -262,30 +298,6 @@ const GameContainer = () => {
     setGameData({...gameData, resultsData: {[day]: newResultsData}})
   }
   
-  //DEPRECATED
-  //deprecate this by making an atomic function capable of spitting out correctly formatted html
-  // const compareYear = (currentGuess, answer) => {
-  //   // console.log(currentGuess, answer)
-  //   if (currentGuess.releaseDate === answer.releaseDate) {
-  //     return (
-  //       <div>
-  //         {currentGuess.releaseDate}: ✅ Same Year
-  //       </div>
-  //     )
-  //   } else if (currentGuess.releaseDate > answer.releaseDate) {
-  //     return (
-  //       <div>
-  //         {currentGuess.releaseDate}: ❌ Too new
-  //       </div>
-  //     )
-  //   } else {
-  //     return (
-  //       <div>
-  //         {currentGuess.releaseDate}: ❌ Too old
-  //       </div>
-  //     )
-  //   }
-  // }
 
   const parseRating = (rating) => {
     let esrbRating = null;
@@ -322,6 +334,7 @@ const GameContainer = () => {
       getToken()
     } else {
       getAnswerData()
+      console.log(day)
     };
   }, [token]);
 
@@ -329,6 +342,17 @@ const GameContainer = () => {
     checkSuccess()
     console.log(gameData)
   }, [gameData])
+
+  useEffect(() => {
+
+    if (guess.length !== 0) {
+      // console.log(guess)
+      setOpen(true)
+      getSuggestions(guess)
+    } else {
+      setOpen(false)
+    }
+  }, [guess])
 
   const checkSuccess = () => {
     //there must be a better way to check the last element of an array
@@ -377,6 +401,16 @@ const GameContainer = () => {
     )
   }
 
+  const autoSuggestionRender = (suggestionArray) => {
+    return suggestionArray.map((element, index) => {
+      return (
+        <div key={index} className='autosuggestions' onClick={(e) => setAutoSuggest({...autoSuggest, suggestId: element.id})}>
+          {element.name} ({element.releaseDate})
+        </div>
+      )
+    })
+  }
+
   return (
     <div>
       <div className='guessData'>
@@ -387,11 +421,13 @@ const GameContainer = () => {
         )}</div>
         <div>{gameData.guessData[day][5] && checkSuccess() === false  ? `The answer is: ${gameData.answerData.gameName}` : null}</div>
       </div>
-      
+      {}
       {(!gameData.guessData[day][5] && checkSuccess() === false) && 
         <div className='guessSubmission' style={{marginTop: '2em'}}>
           <form autoComplete='off' noValidate className='guessForm' onSubmit={handleGuessSubmit}>
-            <TextField placeholder='Guess a random game!' className='guessInput' onChange={(e) => setGuess(e.target.value)} value={guess}/>
+            {loading && <CircularProgress />}
+            {open && autoSuggest.suggestions.length > 0 ? autoSuggestionRender(autoSuggest.suggestions) : null}
+            <TextField placeholder='Guess a random game!' className='guessInput' onChange={(e) => setGuess(e.target.value, {/* setAutoSuggest({...autoSuggest, suggestId: ''}) */})} value={guess}/>
             <Button variant='contained' style={{marginTop: '20px'}} type="submit">
               Submit Guess
             </Button>
