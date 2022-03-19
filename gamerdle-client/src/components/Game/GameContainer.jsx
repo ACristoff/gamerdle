@@ -3,6 +3,8 @@ import axios from 'axios';
 
 import gameLibrary from './gameLibrary';
 
+import mRating from '../../images/ESRB_M_Rating.png'
+
 import { TextField, Button, CircularProgress, Typography, Paper, Container, ClickAwayListener, Box} from '@material-ui/core';
 
 //Make it so that the autosuggest when clicked, searches for the ID of the given title using a new function getGuessById(id)
@@ -208,7 +210,7 @@ const GameContainer = () => {
         }
         return interpretedElement
       });
-      setAutoSuggest({...autoSuggest, suggestions: suggestionArray}, console.log(autoSuggest))
+      setAutoSuggest({...autoSuggest, suggestions: suggestionArray} /*, console.log(autoSuggest) */)
     })
     .catch (error => {
       console.log(error)
@@ -244,6 +246,16 @@ const GameContainer = () => {
           }
         }
       }
+      const companies = response.data[0].involved_companies.map((element) => {
+        return element.company.name 
+      })
+      const platformArray = response.data[0].platforms.map((element) => {
+        return element.abbreviation
+      })
+
+      const genreArray = response.data[0].genres.map((element) => {
+        return element.name
+      })
 
       setGameData({
         ...gameData,
@@ -254,9 +266,12 @@ const GameContainer = () => {
           rating: ratingOfGame,
           ratingEnum: ratingEnum,
           genres: response.data[0].genres,
+          genreArray: genreArray,
           platforms: response.data[0].platforms,
+          platformArray: platformArray,
           playerPerspectives: response.data[0].player_perspectives,
-          involvedCompanies: response.data[0].involved_companies
+          involvedCompanies: response.data[0].involved_companies,
+          companies: companies
         }  
       })
     })
@@ -282,10 +297,12 @@ const GameContainer = () => {
     //compare ESRB rating
     if (guess.ratingEnum === null && answer.ratingEnum === null) {
       result.rating = `Unrated: ✅ Both games are unrated`
+      result.ratingCorrect = true
     } else if (guess.ratingEnum === null && answer.ratingEnum !== null) {
       result.rating = `Unrated: ❌ The target game is rated on the ESRB`
     } else if(guess.ratingEnum === answer.ratingEnum) {
       result.rating = `${guess.rating}: ✅ Same rating`
+      result.ratingCorrect = true
     } else if (guess.ratingEnum > answer.ratingEnum) {
       result.rating = `${guess.rating}: ❌ Too mature`
     } else {
@@ -395,7 +412,7 @@ const GameContainer = () => {
       getToken()
     } else {
       getAnswerData()
-      console.log(day)
+      // console.log(day)
     };
   }, [token]);
 
@@ -454,9 +471,9 @@ const GameContainer = () => {
         <Typography>
           Companies: {mapArray(guessResult.companies)}
         </Typography>
-        <Typography>
+        {/* <Typography>
           Perspectives: {mapArray(guessResult.perspectives)}
-        </Typography>
+        </Typography> */}
         <Typography>
           Genres: {mapArray(guessResult.genres)}
         </Typography>
@@ -478,11 +495,70 @@ const GameContainer = () => {
         })}
       </Paper>
     )
-
   }
 
   const handleClickAway = () => {
     setOpen(false)
+  }
+
+  const checkMatch = (guess, guessType, answerType) => {
+    const guessArray = guess[guessType].sort()
+    const answerArray = gameData.answerData[answerType].sort()
+    // console.log(JSON.stringify(guessArray), JSON.stringify(answerArray))
+    if (JSON.stringify(guess[guessType]) === JSON.stringify(gameData.answerData[answerType])) {
+      return `🟩`
+    } else if (guessArray[0] === answerArray[0]) {
+      return `🟨`
+    } else {
+      return `⬛`
+    }
+  }
+
+  const parseResults = (data) => {
+    const parsed = []
+
+    parsed.push(`Nerdle: Games: ${day}`)
+    //turns out I didn't need the index after all but I learned a neat new trick about destructuring for of loops of arrays!
+    for (const [index, guess] of data.entries()) {
+      if (guess.correct) {
+        parsed.push(`🟩🟩🟩🟩🟩: ✅`)
+      } else {
+        const guessResult = []
+
+        //checks if the rating is correct
+        if (guess.ratingCorrect) {
+          guessResult.push(`🟩`)
+        } else {
+          guessResult.push(`⬛`)
+        }
+
+        //checks if the year is newer or older or matches
+        // console.log(guess.year.slice(-3))
+        if (guess.year.slice(-3) === `new`) {
+          guessResult.push(`⏪`)
+        } else if (guess.year.slice(-3) === `old`) {
+          guessResult.push(`⏩`)
+        } else {
+          guessResult.push(`🟩`)
+        }
+
+        //checks for platforms
+        guessResult.push(checkMatch(guess, `platforms`, `platformArray`))
+
+        //checks for companies
+        guessResult.push(checkMatch(guess, `companies`, `companies`))
+
+        //checks for genres
+        guessResult.push(checkMatch(guess, `genres`, `genreArray`))
+        
+        guessResult.push(`: ❌`)
+        parsed.push(guessResult.join(``))
+      }
+    }
+
+    parsed.push(`http://localhost:3000/`)
+    // console.log(parsed.join("\n"))
+    return parsed
   }
 
   return (
@@ -501,18 +577,27 @@ const GameContainer = () => {
           <ClickAwayListener onClickAway={handleClickAway}>
             <Box>
               <form autoComplete='off' noValidate className='guessForm' onSubmit={handleGuessSubmit}>
-              {loading && <CircularProgress />}
-              {open && autoSuggest.suggestions.length > 0 ? autoSuggestionRender(autoSuggest.suggestions) : null}
-              <TextField placeholder='Guess a random game!' className='guessInput' onChange={(e) => setGuess(e.target.value, {/* setAutoSuggest({...autoSuggest, suggestId: ''}) */})} value={guess}/>
-              <Button variant='contained' style={{marginTop: '20px'}} type="submit">
-                Submit Guess
-              </Button>
+                {loading && <CircularProgress />}
+                {open && autoSuggest.suggestions.length > 0 ? autoSuggestionRender(autoSuggest.suggestions) : null}
+                <TextField placeholder='Guess a random game!' className='guessInput' onChange={(e) => setGuess(e.target.value, {/* setAutoSuggest({...autoSuggest, suggestId: ''}) */})} value={guess}/>
+                <Button variant='contained' style={{marginTop: '20px'}} type="submit">
+                  Submit Guess
+                </Button>
               </form>
             </Box>
           </ClickAwayListener>
-
         </div>
       }
+      {(gameData.guessData[day][5] || checkSuccess() === true) && 
+        <div>
+          {/* {parseResults(gameData.resultsData[day])} */}
+          {/* onClick={() => {navigator.clipboard.writeText(this.state.textToCopy)}} */}
+          <Button variant='contained' onClick={() => {navigator.clipboard.writeText(parseResults(gameData.resultsData[day]).join("\n"))}}>
+          Share your results!
+          </Button>
+        </div>
+      }
+      {/* <img src={mRating} width='100px'/> */}
     </Container>
   )
 };
