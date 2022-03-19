@@ -419,6 +419,7 @@ const GameContainer = () => {
   useEffect(() => {
     checkSuccess()
     console.log(gameData)
+    localStorage.setItem('guesses', JSON.stringify(gameData.guessData))
   }, [gameData])
 
   useEffect(() => {
