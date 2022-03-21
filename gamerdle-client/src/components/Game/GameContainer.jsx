@@ -565,13 +565,21 @@ const GameContainer = () => {
       }
     }
 
-    parsed.push(`http://localhost:3000/`)
+    parsed.push(`${window.location.href}`)
     // console.log(parsed.join("\n"))
     return parsed
   }
 
+  const coverId = gameData.answerData.raw ? gameData.answerData.raw.cover.image_id : null;
+
   return (
     <Container>
+      {coverId &&
+        <div className='hintContainer'>
+            <Typography>Hint</Typography>
+            <img className='hint' src={`https://images.igdb.com/igdb/image/upload/t_cover_big/${coverId}.jpg`}/>
+        </div>
+      }
       <div className='guessData'>
         {/* {gameData.resultsData[day][0] && guessRender(gameData.resultsData[day][0])} */}
         {gameData.resultsData[day].map((result, index) => guessRender(result, index))}

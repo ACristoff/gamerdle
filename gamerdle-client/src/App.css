@@ -2,17 +2,6 @@
   text-align: center;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
 .App {
   background-color: #282c34;
   min-height: 100vh;
@@ -48,7 +37,7 @@
 }
 
 .guessData {
-  color:blue
+  color:aliceblue
 }
 
 /* .guessPaper {
@@ -69,6 +58,17 @@
   padding: 0.4em;
   max-width:30vw;
 }
+
+.hint {
+  filter: blur(12px);
+  /* backdrop-filter: blur(5px); */
+  width: 220px;
+}
+
+/* .hintContainer {
+  background-color: rgba(255, 255, 255, .15); 
+  backdrop-filter: blur(5px);
+} */
 /* .Footer {
 
 } */
