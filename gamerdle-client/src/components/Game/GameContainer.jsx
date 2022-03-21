@@ -36,6 +36,9 @@ const GameContainer = () => {
   //if there is no guessProfile in local storage, set it to a blank format
   if (!guessProfile) {
     guessProfile = {guessData:{[day]: []}, resultsData:{[day]: []}}
+  } else if (!guessProfile.guessData[day]) {
+    guessProfile.guessData[day] = []
+    guessProfile.resultsData[day] = []    
   }
   //set the default values, if there is any guessProfile history it will show up here
   const [gameData, setGameData] = useState({
