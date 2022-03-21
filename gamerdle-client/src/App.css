@@ -40,6 +40,7 @@
 
 .autoSuggestContainer {
   background-color: #282c34;
+  /* position: absolute; */
 }
 
 .guessSubmissions {
@@ -47,6 +48,7 @@
 }
 
 .guessData {
+  color:blue
 }
 
 /* .guessPaper {

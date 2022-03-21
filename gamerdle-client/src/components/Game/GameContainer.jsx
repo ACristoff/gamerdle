@@ -26,16 +26,20 @@ const GameContainer = () => {
   // const [gameId, setGameId] = useState('');
   const [open, setOpen] = useState(false)
   const loading = open && autoSuggest.suggestions.length === 0;
-
   //the library of answers
   const library = gameLibrary;
 
   const tzoffset = (new Date()).getTimezoneOffset() * 60000
   const day = new Date(Date.now() - tzoffset).toISOString().slice(0, 10);
+  let guessProfile = JSON.parse(localStorage.getItem('guesses'))
+
+  if (!guessProfile) {
+    guessProfile = {guessData:{[day]: []}, resultsData:{[day]: []}}
+  }
   const [gameData, setGameData] = useState({
-    guessData: {[day]: []},
+    guessData: {...guessProfile.guessData},
     answerData: {},
-    resultsData: {[day]: []}
+    resultsData: {...guessProfile.resultsData}
   })
   //sample resultsData
   //{"2022-03-15":[
@@ -272,7 +276,7 @@ const GameContainer = () => {
           playerPerspectives: response.data[0].player_perspectives,
           involvedCompanies: response.data[0].involved_companies,
           companies: companies
-        }  
+        } 
       })
     })
     .catch(error => {
@@ -375,7 +379,6 @@ const GameContainer = () => {
     newResultsData.push(result)
     setGameData({...gameData, resultsData: {[day]: newResultsData}})
   }
-  
 
   const parseRating = (rating) => {
     let esrbRating = null;
@@ -419,7 +422,7 @@ const GameContainer = () => {
   useEffect(() => {
     checkSuccess()
     console.log(gameData)
-    localStorage.setItem('guesses', JSON.stringify(gameData.guessData))
+    localStorage.setItem('guesses', JSON.stringify({guessData: gameData.guessData, resultsData: gameData.resultsData}))
   }, [gameData])
 
   useEffect(() => {
