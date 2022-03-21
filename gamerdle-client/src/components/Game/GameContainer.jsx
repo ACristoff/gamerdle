@@ -31,11 +31,13 @@ const GameContainer = () => {
 
   const tzoffset = (new Date()).getTimezoneOffset() * 60000
   const day = new Date(Date.now() - tzoffset).toISOString().slice(0, 10);
+  //pull guessProfile from local storage
   let guessProfile = JSON.parse(localStorage.getItem('guesses'))
-
+  //if there is no guessProfile in local storage, set it to a blank format
   if (!guessProfile) {
     guessProfile = {guessData:{[day]: []}, resultsData:{[day]: []}}
   }
+  //set the default values, if there is any guessProfile history it will show up here
   const [gameData, setGameData] = useState({
     guessData: {...guessProfile.guessData},
     answerData: {},
