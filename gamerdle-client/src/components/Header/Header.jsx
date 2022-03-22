@@ -6,7 +6,7 @@ const Header = () => {
 
   return (
     <Container className="header">
-      NERDLE
+      DORKLE: GAMES
     </Container>
   )
 }
