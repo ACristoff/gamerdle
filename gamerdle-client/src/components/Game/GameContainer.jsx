@@ -5,6 +5,7 @@ import gameLibrary from './gameLibrary';
 
 import mRating from '../../images/ESRB_M_Rating.png'
 
+import useStyles  from './styles';
 import { TextField, Button, CircularProgress, Typography, Paper, Container, ClickAwayListener, Box} from '@material-ui/core';
 
 //Make it so that the autosuggest when clicked, searches for the ID of the given title using a new function getGuessById(id)
@@ -25,6 +26,7 @@ const GameContainer = () => {
   });
   const [open, setOpen] = useState(false)
   const [warning, setWarning] = useState('')
+  const classes = useStyles();
   const loading = open && autoSuggest.suggestions.length === 0;
   //the library of answers
   const library = gameLibrary;
@@ -441,25 +443,25 @@ const GameContainer = () => {
         <Typography>
           {guessResult.correct ? `✅` : `❌`}  {guessResult.guess}
         </Typography>
+        <div className={classes.resultsBinaries}>
+          <Typography>
+            <b>{guessResult.rating[0]}</b>: {guessResult.rating.slice(2)} <b>{guessResult.year.slice(0,4)}</b>: {guessResult.year.slice(5)}
+          </Typography>        
+        </div>
+
+
 
         <Typography>
-          {guessResult.rating}
-        </Typography>
-
-        <Typography>
-          {guessResult.year}
+          <b>Platforms:</b> {mapArray(guessResult.platforms)}
         </Typography>
         <Typography>
-          Platforms: {mapArray(guessResult.platforms)}
-        </Typography>
-        <Typography>
-          Companies: {mapArray(guessResult.companies)}
+          <b>Companies:</b> {mapArray(guessResult.companies)}
         </Typography>
         {/* <Typography>
           Perspectives: {mapArray(guessResult.perspectives)}
         </Typography> */}
         <Typography>
-          Genres: {mapArray(guessResult.genres)}
+          <b>Genres:</b> {mapArray(guessResult.genres)}
         </Typography>
     </Paper>
     )
@@ -579,12 +581,14 @@ const GameContainer = () => {
   }, [guess])
 
   return (
-    <Container>
-      {coverId &&
+    <Container maxWidth='sm'>
+      {coverId ?
         <div className='hintContainer'>
-            <Typography>Hint</Typography>
-            <img className={coverClass ? "hint" : ""} alt='game cover hint' src={`https://images.igdb.com/igdb/image/upload/t_cover_big/${coverId}.jpg`}/>
+            {/* <Typography>Hint</Typography> */}
+            <img className={coverClass ? classes.hint : ""} alt='game cover hint' src={`https://images.igdb.com/igdb/image/upload/t_cover_big/${coverId}.jpg`}/>
         </div>
+        :
+        <CircularProgress />
       }
       <div className='guessData'>
         {gameData.resultsData[day].map((result, index) => guessRender(result, index))}
@@ -600,7 +604,7 @@ const GameContainer = () => {
               <form autoComplete='off' noValidate className='guessForm' onSubmit={handleGuessSubmit}>
                 {loading && <CircularProgress />}
                 {open && autoSuggest.suggestions.length > 0 ? autoSuggestionRender(autoSuggest.suggestions) : null}
-                <TextField placeholder='Guess a random game!' className='guessInput' onChange={(e) => setGuess(e.target.value, {/* setAutoSuggest({...autoSuggest, suggestId: ''}) */})} value={guess}/>
+                <TextField placeholder='Guess the game!' className='guessInput' onChange={(e) => setGuess(e.target.value, {/* setAutoSuggest({...autoSuggest, suggestId: ''}) */})} value={guess}/>
                 <Button variant='contained' style={{marginTop: '20px'}} type="submit">
                   Submit Guess
                 </Button>

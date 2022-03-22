@@ -1,31 +1,32 @@
-import { AppBar, Typography } from '@material-ui/core'
-import { Link } from 'react-router-dom'
 import React from 'react'
-
+import { Button, Typography } from '@material-ui/core'
+import { Link, useNavigate } from 'react-router-dom'
+import useStyles  from './styles';
 
 const Navbar = () => {
+  const classes = useStyles();
 
 
   return (
-    <AppBar>
-      Dorkle
-      <Link to={'/games'}>
-      {/* style={{ textDecoration: 'none', color: 'unset' }} */}
-        <Typography>Games</Typography>
-      </Link>
-      <Link to={'/movies'}>
-        <Typography>Movies</Typography>
-      </Link>
-      <Link to={'/anime'}>
-        <Typography>Anime</Typography>
-      </Link>
-      <Link to={'/manga'}>
-        <Typography>Manga</Typography>
-      </Link>
-      <Link to={'/books'}>
-        <Typography>Books</Typography>
-      </Link>
-    </AppBar>
+    <div className={classes.appBar}>
+      <div className={classes.navigation}>
+        <Button variant='contained' href='/games' size='small' className={classes.navLinkButton}>
+          Games
+        </Button>
+        <Button variant='contained' href='/movies' className={classes.navLinkButton}>
+          Movies
+        </Button>
+        <Button variant='contained' href='/anime' className={classes.navLinkButton}>
+          Anime
+        </Button>
+        <Button variant='contained' href='/manga' className={classes.navLinkButton}>
+          Manga
+        </Button>
+        <Button variant='contained' href='/books' className={classes.navLinkButton}>
+          Books
+        </Button>
+      </div>
+    </div>
   )
 }
 

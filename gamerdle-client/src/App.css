@@ -9,65 +9,13 @@
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  font-size: calc(10px + 2vmin);
+  font-size: calc(8px + 2vmin);
   color: white;
 }
 
-.guessForm {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.guessInput input{
-  color:aliceblue;
-}
-
-.guessInput {
-  color:aliceblue;
-}
-
-.autoSuggestContainer {
-  background-color: #282c34;
-  /* position: absolute; */
-}
-
-.guessSubmissions {
-  max-width: 50%;
-}
-
-.guessData {
-  color:aliceblue
-}
-
-/* .guessPaper {
-  padding: 0.4em;
-  background-color: #282c34;
-  color: aliceblue;
-} */
-
-#guessPaperContainer {
-  padding: 0.4em;
-  background-color: #282c34;
-  color: aliceblue;
-}
-
-#autoSuggestContainer {
-  background-color: #282c34;
-  color: aliceblue;
-  padding: 0.4em;
-  max-width:30vw;
-}
-
-.hint {
-  filter: blur(20px);
-  /* backdrop-filter: blur(5px); */
-  width: 220px;
-}
-
-.resolved {
+/* .resolved {
   filter: blur(0px) !important;
-}
+} */
 
 /* .hintContainer {
   background-color: rgba(255, 255, 255, .15); 

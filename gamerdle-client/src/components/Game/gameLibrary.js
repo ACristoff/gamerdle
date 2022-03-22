@@ -3,7 +3,7 @@ const gameLibrary = {
   "2022-03-22" : "Dark Souls",
   "2022-03-23" : "Kirby's Dream Land",
   "2022-03-24" : "Counter Strike Source",
-  "2022-03-25" : "The Darkness",
+  "2022-03-25" : "The Darkness 2",
   "2022-03-26" : "Eternal Darkness",
   "2022-03-27" : "Devil May Cry 3",
   "2022-03-28" : "The King of Fighters XI",
