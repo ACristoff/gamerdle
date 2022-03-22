@@ -23,7 +23,6 @@ const GameContainer = () => {
     suggestions: [],
     suggestId: ''
   });
-  // const [gameId, setGameId] = useState('');
   const [open, setOpen] = useState(false)
   const [warning, setWarning] = useState('')
   const loading = open && autoSuggest.suggestions.length === 0;
@@ -76,14 +75,14 @@ const GameContainer = () => {
         setToken(res.data.access_token)
       });
     } catch (error) {
-      console.log(error)
+      console.warn(error)
     }
   };
 
   const getGuessDataByName = async (guessedGame) => {
     // below commented code is for using /search/ instead of /games/ which seems to be less accurate (?)
     // const bodyData = `search "${guessedGame}"; fields alternative_name,character,checksum,collection,company,description,game,name,platform,published_at,test_dummy,theme;`
-    const bodyData = `search "${guessedGame}"; fields *, age_ratings.*, game_modes.*, involved_companies.*, involved_companies.company.*, genres.*, player_perspectives.*, platforms.*, cover.*, artworks.*; where version_parent = null; limit 1;`
+    const bodyData = `search "${guessedGame}"; fields *, age_ratings.*, game_modes.*, involved_companies.*, involved_companies.company.*, genres.*, player_perspectives.*, platforms.*, cover.*, artworks.*; where version_parent = null; where category = 0; limit 1;`
     
     axios({
       method: 'POST',
@@ -135,7 +134,7 @@ const GameContainer = () => {
       setGuess('');
     })
     .catch (error => {
-      console.log(error)
+      console.warn(error)
     });
   }
 
@@ -155,13 +154,13 @@ const GameContainer = () => {
       },
       data: bodyData
     }).then(response => {
-      // console.log(response.data)
       //basic error handling if no game comes up
       if (response.data[0] === undefined) {
-        console.warn('no game found')
+        console.warn('no game found');
         setGuess('');
+        setWarning('No game found.');
         return
-      }
+      };
 
       const releaseDateOfGame = Number(new Date(response.data[0].first_release_date * 1000).toLocaleDateString("en-us").slice(-4))
       //check to see if ratingOfGame remains accurate through debugging, otherwise make an algorithm to only select the one that has category = 0 (esrb category) DONE
@@ -193,12 +192,12 @@ const GameContainer = () => {
       setGuess('');
     })
     .catch (error => {
-      console.log(error)
+      console.warn(error)
     });
   }
 
   const getSuggestions = async (input) => {
-    const bodyData = `search "${input}"; fields name, first_release_date; where version_parent = null; where category != 1; limit 5;`
+    const bodyData = `search "${input}"; fields name, first_release_date; where version_parent = null; where category = 0; limit 5;`
 
     axios({
       method: 'POST',
@@ -224,12 +223,12 @@ const GameContainer = () => {
       setAutoSuggest({...autoSuggest, suggestions: suggestionArray} /*, console.log(autoSuggest) */)
     })
     .catch (error => {
-      console.log(error)
+      console.warn(error)
     })
   }
 
   const getAnswerData = async () => {
-    const bodyData = `search "${library[day]}"; fields *, age_ratings.*, game_modes.*, involved_companies.*, involved_companies.company.*, genres.*, player_perspectives.*, platforms.*, cover.*, artworks.*; where version_parent = null; limit 1;`
+    const bodyData = `search "${library[day]}"; fields *, age_ratings.*, game_modes.*, involved_companies.*, involved_companies.company.*, genres.*, player_perspectives.*, platforms.*, cover.*, artworks.*; where version_parent = null; where category = 0; limit 1;`
     // Example query for /games/ endpoint
     // `search "nier"; fields *; limit 10;`
     // where version_parent = null
@@ -287,7 +286,7 @@ const GameContainer = () => {
       })
     })
     .catch(error => {
-      console.log(error)
+      console.warn(error)
     })
   }
 
@@ -416,33 +415,6 @@ const GameContainer = () => {
     }
     return esrbRating
   }
-
-  useEffect(() => {
-    if (!token) {
-      getToken()
-    } else {
-      getAnswerData()
-      // console.log(day)
-    };
-  }, [token]);
-
-  useEffect(() => {
-    checkSuccess()
-    console.log(gameData)
-    localStorage.setItem('guesses', JSON.stringify({guessData: gameData.guessData, resultsData: gameData.resultsData}))
-  }, [gameData])
-
-  useEffect(() => {
-
-    if (guess.length !== 0) {
-      // console.log(guess)
-      setWarning('')
-      setOpen(true)
-      getSuggestions(guess)
-    } else {
-      setOpen(false)
-    }
-  }, [guess])
 
   const checkSuccess = () => {
     //there must be a better way to check the last element of an array
@@ -576,6 +548,36 @@ const GameContainer = () => {
   const coverId = gameData.answerData.raw ? gameData.answerData.raw.cover.image_id : null;
   const coverClass = gameData.guessData[day][5] || checkSuccess() === false
 
+
+  //Initial useEffect to grab token
+  useEffect(() => {
+    if (!token) {
+      getToken()
+    } else {
+      getAnswerData()
+      // console.log(day)
+    };
+  }, [token]);
+
+  //UseEffect that updates whenever gameData changes, checking to see if success state is reached, and then updating the localstorage
+  useEffect(() => {
+    checkSuccess()
+    console.log(gameData)
+    localStorage.setItem('guesses', JSON.stringify({guessData: gameData.guessData, resultsData: gameData.resultsData}))
+  }, [gameData])
+
+  //UseEffect that updates whenever the guess form is updated, resets any current warning, opens the autosuggest, sends a query for suggestions
+  useEffect(() => {
+    if (guess.length !== 0) {
+      // console.log(guess)
+      setWarning('')
+      setOpen(true)
+      getSuggestions(guess)
+    } else {
+      setOpen(false)
+    }
+  }, [guess])
+
   return (
     <Container>
       {coverId &&
@@ -585,7 +587,6 @@ const GameContainer = () => {
         </div>
       }
       <div className='guessData'>
-        {/* {gameData.resultsData[day][0] && guessRender(gameData.resultsData[day][0])} */}
         {gameData.resultsData[day].map((result, index) => guessRender(result, index))}
         <div>{checkSuccess() && (
           <>Success! The answer was {gameData.answerData.gameName} ({gameData.answerData.releaseDate})</>
@@ -615,14 +616,11 @@ const GameContainer = () => {
       }
       {(gameData.guessData[day][5] || checkSuccess() === true) && 
         <div>
-          {/* {parseResults(gameData.resultsData[day])} */}
-          {/* onClick={() => {navigator.clipboard.writeText(this.state.textToCopy)}} */}
           <Button variant='contained' onClick={() => {navigator.clipboard.writeText(parseResults(gameData.resultsData[day]).join("\n"))}}>
           <Typography>Share your results! (Copy to clipboard)</Typography>
           </Button>
         </div>
       }
-      {/* <img src={mRating} width='100px'/> */}
     </Container>
   )
 };

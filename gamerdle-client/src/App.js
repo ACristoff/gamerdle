@@ -1,20 +1,23 @@
 import React from 'react';
+import { BrowserRouter, Routes, Route, Navigate} from 'react-router-dom';
 
 import Footer from './components/Footer/Footer';
 import GameContainer from './components/Game/GameContainer';
 import Header from './components/Header/Header';
 
+import { Container } from '@material-ui/core';
 import './App.css';
 
 const App = () => {
-//   const user = JSON.parse(localStorage.getItem('profile'));
 
   return (
-    <div className="App">
-      <Header />
-      <GameContainer />
-      <Footer />
-    </div>
+    <BrowserRouter>
+      <Container className="App" maxWidth={false}>
+        <Header />
+        <GameContainer />
+        <Footer />
+      </Container>
+    </BrowserRouter>
   );
 }
 
