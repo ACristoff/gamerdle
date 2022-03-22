@@ -14,7 +14,14 @@ const App = () => {
     <BrowserRouter>
       <Container className="App" maxWidth={false}>
         <Header />
-        <GameContainer />
+        <Routes>
+          <Route path="/" exact element={<Navigate to="/games" />} />
+          <Route path="/games" exact element={<GameContainer />}/>
+          <Route path="/movies" exact element={<GameContainer />}/>
+          <Route path="/anime" exact element={<GameContainer />}/>
+          <Route path="/manga" exact element={<GameContainer />}/>
+          <Route path="/books" exact element={<GameContainer />}/>
+        </Routes>
         <Footer />
       </Container>
     </BrowserRouter>
@@ -22,26 +29,3 @@ const App = () => {
 }
 
 export default App;
-
-// import { Container } from '@material-ui/core'
-// import { BrowserRouter, Routes, Route, Navigate} from 'react-router-dom';
-
-// import Navbar from "./components/Navbar/Navbar";
-// import Home from "./components/Home/Home";
-
-// const App = () => {
-
-
-//   return (
-//     <BrowserRouter>
-//       <Container maxWidth="xl">
-//         <Navbar />
-//           <Routes>
-//             <Route path="/games" exact element={<GameContainer />} />
-//           </Routes>
-//       </Container>
-//     </BrowserRouter>
-//   )
-// }
-
-// export default App;
