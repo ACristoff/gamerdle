@@ -469,7 +469,13 @@ const GameContainer = () => {
 
   const autoSuggestionRender = (suggestionArray) => {
     return (
-      <Paper id='autoSuggestContainer' elevation={6}>
+      <Paper 
+        id='autoSuggestContainer' 
+        className={classes.autoSuggestContainer} 
+        elevation={6}
+        // anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        // transformOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
         {suggestionArray.map((element, index) => {
           return (
             <div key={index} className='autosuggestion'>
@@ -583,9 +589,9 @@ const GameContainer = () => {
   return (
     <Container maxWidth='sm'>
       {coverId ?
-        <div className='hintContainer'>
+        <div className={classes.hintContainer}>
             {/* <Typography>Hint</Typography> */}
-            <img className={coverClass ? classes.hint : ""} alt='game cover hint' src={`https://images.igdb.com/igdb/image/upload/t_cover_big/${coverId}.jpg`}/>
+            <img className={coverClass ? classes.hint : classes.resolved} alt='game cover hint' src={`https://images.igdb.com/igdb/image/upload/t_cover_big/${coverId}.jpg`}/>
         </div>
         :
         <CircularProgress />

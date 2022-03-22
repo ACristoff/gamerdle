@@ -12,15 +12,17 @@ const App = () => {
   return (
     <BrowserRouter>
       <div className="App">
-        <Header />
-        <Routes>
-          <Route path="/" exact element={<Navigate to="/games" />} />
-          <Route path="/games" exact element={<GameContainer />} />
-          <Route path="/movies" exact element={<GameContainer />} />
-          <Route path="/anime" exact element={<GameContainer />} />
-          <Route path="/manga" exact element={<GameContainer />} />
-          <Route path="/books" exact element={<GameContainer />} />
-        </Routes>
+        <div>
+          <Header />
+          <Routes>
+            <Route path="/" exact element={<Navigate to="/games" />} />
+            <Route path="/games" exact element={<GameContainer />} />
+            <Route path="/movies" exact element={<GameContainer />} />
+            <Route path="/anime" exact element={<GameContainer />} />
+            <Route path="/manga" exact element={<GameContainer />} />
+            <Route path="/books" exact element={<GameContainer />} />
+          </Routes>
+        </div>
         <Footer />
       </div>
     </BrowserRouter>

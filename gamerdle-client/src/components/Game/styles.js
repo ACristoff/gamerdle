@@ -2,7 +2,12 @@ import { makeStyles } from '@material-ui/core/styles';
 
 export default makeStyles((theme) => ({
   hint: {
-    filter: 'blur(20px)'
+    filter: 'blur(20px)',
+    maxWidth: '12rem',
+    marginTop: '3vh'
+  },
+  resolved: {
+    maxWidth: '12rem'
   },
   resultsBinaries: {
     display: 'flex',
@@ -10,7 +15,14 @@ export default makeStyles((theme) => ({
     justifyContent: 'center',
     alignContent: 'center',
     alignItems: 'center',
-  }
+  },
+  autoSuggestContainer: {
+    position: 'absolute',
+    // display: 'block',
+    zIndex: '1',
+    // top: '0px'
+    transform: 'translateY(-100%)'
+  },
 
 }));
 
