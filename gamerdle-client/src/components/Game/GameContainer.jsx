@@ -25,6 +25,7 @@ const GameContainer = () => {
   });
   // const [gameId, setGameId] = useState('');
   const [open, setOpen] = useState(false)
+  const [warning, setWarning] = useState('')
   const loading = open && autoSuggest.suggestions.length === 0;
   //the library of answers
   const library = gameLibrary;
@@ -100,6 +101,7 @@ const GameContainer = () => {
       if (response.data[0] === undefined) {
         console.warn('no game found')
         setGuess('');
+        setWarning('No game found.')
         return
       }
 
@@ -434,6 +436,7 @@ const GameContainer = () => {
 
     if (guess.length !== 0) {
       // console.log(guess)
+      setWarning('')
       setOpen(true)
       getSuggestions(guess)
     } else {
@@ -571,13 +574,14 @@ const GameContainer = () => {
   }
 
   const coverId = gameData.answerData.raw ? gameData.answerData.raw.cover.image_id : null;
+  const coverClass = gameData.guessData[day][5] || checkSuccess() === false
 
   return (
     <Container>
       {coverId &&
         <div className='hintContainer'>
             <Typography>Hint</Typography>
-            <img className='hint' src={`https://images.igdb.com/igdb/image/upload/t_cover_big/${coverId}.jpg`}/>
+            <img className={coverClass ? "hint" : ""} alt='game cover hint' src={`https://images.igdb.com/igdb/image/upload/t_cover_big/${coverId}.jpg`}/>
         </div>
       }
       <div className='guessData'>
@@ -588,7 +592,6 @@ const GameContainer = () => {
         )}</div>
         <div>{gameData.guessData[day][5] && checkSuccess() === false  ? `The answer is: ${gameData.answerData.gameName}` : null}</div>
       </div>
-      {}
       {(!gameData.guessData[day][5] && checkSuccess() === false) && 
         <div className='guessSubmission' style={{marginTop: '2em'}}>
           <ClickAwayListener onClickAway={handleClickAway}>
@@ -600,6 +603,11 @@ const GameContainer = () => {
                 <Button variant='contained' style={{marginTop: '20px'}} type="submit">
                   Submit Guess
                 </Button>
+                {warning && (
+                  <div>
+                    {warning}
+                  </div>
+                )}
               </form>
             </Box>
           </ClickAwayListener>
@@ -610,7 +618,7 @@ const GameContainer = () => {
           {/* {parseResults(gameData.resultsData[day])} */}
           {/* onClick={() => {navigator.clipboard.writeText(this.state.textToCopy)}} */}
           <Button variant='contained' onClick={() => {navigator.clipboard.writeText(parseResults(gameData.resultsData[day]).join("\n"))}}>
-          Share your results!
+          <Typography>Share your results! (Copy to clipboard)</Typography>
           </Button>
         </div>
       }

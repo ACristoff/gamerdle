@@ -60,9 +60,13 @@
 }
 
 .hint {
-  filter: blur(12px);
+  filter: blur(20px);
   /* backdrop-filter: blur(5px); */
   width: 220px;
+}
+
+.resolved {
+  filter: blur(0px) !important;
 }
 
 /* .hintContainer {
