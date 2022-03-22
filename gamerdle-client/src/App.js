@@ -16,11 +16,11 @@ const App = () => {
         <Header />
         <Routes>
           <Route path="/" exact element={<Navigate to="/games" />} />
-          <Route path="/games" exact element={<GameContainer />}/>
-          <Route path="/movies" exact element={<GameContainer />}/>
-          <Route path="/anime" exact element={<GameContainer />}/>
-          <Route path="/manga" exact element={<GameContainer />}/>
-          <Route path="/books" exact element={<GameContainer />}/>
+          <Route path="/games" exact element={<GameContainer />} />
+          <Route path="/movies" exact element={<GameContainer />} />
+          <Route path="/anime" exact element={<GameContainer />} />
+          <Route path="/manga" exact element={<GameContainer />} />
+          <Route path="/books" exact element={<GameContainer />} />
         </Routes>
         <Footer />
       </Container>
@@ -29,3 +29,17 @@ const App = () => {
 }
 
 export default App;
+
+{/* <BrowserRouter>
+<Container maxWidth="xl">
+  <Navbar />
+    <Routes>
+      <Route path="/" exact element={<Navigate to="/posts"/>} />
+      <Route path="/posts" exact element={<Home />} />
+      <Route path="/posts/search" exact element={<Home />} />
+      <Route path="/posts/:id" element={<PostDetails />} />
+      <Route path="/auth" exact element={!user ? <Auth /> : <Navigate to='/posts' /> }/>
+    </Routes>
+</Container>
+</BrowserRouter>
+) */}
