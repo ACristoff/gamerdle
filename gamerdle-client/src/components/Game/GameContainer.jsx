@@ -6,7 +6,7 @@ import gameLibrary from './gameLibrary';
 import mRating from '../../images/ESRB_M_Rating.png'
 
 import useStyles  from './styles';
-import { TextField, Button, CircularProgress, Typography, Paper, Container, ClickAwayListener, Box} from '@material-ui/core';
+import { TextField, Button, CircularProgress, Typography, Paper, Container, ClickAwayListener, Box, Grow } from '@material-ui/core';
 
 //Make it so that the autosuggest when clicked, searches for the ID of the given title using a new function getGuessById(id)
 //Make it so that suggestions are displayed as mui components
@@ -449,8 +449,6 @@ const GameContainer = () => {
           </Typography>        
         </div>
 
-
-
         <Typography>
           <b>Platforms:</b> {mapArray(guessResult.platforms)}
         </Typography>
@@ -462,8 +460,8 @@ const GameContainer = () => {
         </Typography> */}
         <Typography>
           <b>Genres:</b> {mapArray(guessResult.genres)}
-        </Typography>
-    </Paper>
+        </Typography>  
+      </Paper>
     )
   }
 
