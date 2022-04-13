@@ -380,6 +380,9 @@ const GameContainer = () => {
     guess.guessName === answer.gameName ? result.correct = true : result.correct = false;
 
     result.guess = guess.guessName;
+
+    //write image to this part of the object for easy rendering
+    result.image = 'test'
     
     //push that results object to gameData through setGameData by correctly spreading the information
     // console.log(result)
