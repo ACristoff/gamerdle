@@ -258,9 +258,13 @@ const GameContainer = () => {
           }
         }
       }
-      const companies = response.data[0].involved_companies.map((element) => {
-        return element.company.name 
-      })
+      let companies = 'null'
+      if (response.data[0].involved_companies) {
+        companies = response.data[0].involved_companies.map((element) => {
+          return element.company.name 
+        })
+      }
+
       const platformArray = response.data[0].platforms.map((element) => {
         return element.abbreviation
       })
@@ -444,8 +448,8 @@ const GameContainer = () => {
     }
 
     return (
-      <Paper id='guessPaperContainer' key={i} elevation={6}>
-        <img src={guessResult.image} width='180px'>
+      <Paper className={classes.guessCard} key={i} elevation={6}>
+        <img src={guessResult.image} alt='Guessed Game Cover' width='180px'>
         </img>
         <Typography>
           {guessResult.correct ? `✅` : `❌`}  {guessResult.guess}

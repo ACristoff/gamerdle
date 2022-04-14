@@ -23,7 +23,9 @@ export default makeStyles((theme) => ({
     // top: '0px'
     transform: 'translateY(-100%)'
   },
-
+  guessCard: {
+    padding: '0.5em'
+  }
 }));
 
 // .guessForm {
