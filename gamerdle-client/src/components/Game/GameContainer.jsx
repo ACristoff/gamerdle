@@ -382,10 +382,12 @@ const GameContainer = () => {
     result.guess = guess.guessName;
 
     //write image to this part of the object for easy rendering
-    result.image = 'test'
+    result.image = `https://images.igdb.com/igdb/image/upload/t_cover_big/${guess.raw.cover.image_id}.jpg`
+
+    //https://images.igdb.com/igdb/image/upload/t_cover_big/${coverId}.jpg
     
     //push that results object to gameData through setGameData by correctly spreading the information
-    // console.log(result)
+    // console.log('result is: ', result, 'guess is: ', guess)
     const newResultsData = gameData.resultsData[day]
     newResultsData.push(result)
     setGameData({...gameData, resultsData: {[day]: newResultsData}})
@@ -443,6 +445,8 @@ const GameContainer = () => {
 
     return (
       <Paper id='guessPaperContainer' key={i} elevation={6}>
+        <img src={guessResult.image} width='180px'>
+        </img>
         <Typography>
           {guessResult.correct ? `✅` : `❌`}  {guessResult.guess}
         </Typography>

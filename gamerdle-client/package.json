@@ -2,7 +2,7 @@
   "name": "gamerdle-client",
   "version": "0.1.0",
   "private": true,
-  "proxy": "http://localhost:3000",
+  "proxy": "http://localhost:3000/",
   "dependencies": {
     "@autocomplete/material-ui": "^0.0.17",
     "@emotion/react": "^11.8.2",
