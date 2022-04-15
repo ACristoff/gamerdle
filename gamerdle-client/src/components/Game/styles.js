@@ -33,8 +33,32 @@ export default makeStyles((theme) => ({
     alignItems: 'center'
     // width:'100%'
     // alignContent: 'center'
+  },
+  guessCarouselContainer: {
+    display: 'flex',
+    flexDirection: 'row',
+    width: '100%',
+    'overflow-x': 'auto',
+    overflow: 'hidden',
+    maxWidth: '100vw'
+    // 'scrollbar-width': 'none'
+    // '::-webkit-scrollbar': '{display: none}'
+  },
+  gameContainer: {
+    padding: '0px'
   }
 }));
+
+// /* Hide scrollbar for Chrome, Safari and Opera */
+// .scrolling-card-list-container::-webkit-scrollbar {
+//   display: none;
+// }
+
+// /* Hide scrollbar for IE, Edge and Firefox */
+// .scrolling-card-list-container {
+//   -ms-overflow-style: none;  /* IE and Edge */
+//   scrollbar-width: none;  /* Firefox */
+// }
 
 // .guessForm {
 //   display: flex;

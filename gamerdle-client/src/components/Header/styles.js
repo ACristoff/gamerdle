@@ -5,13 +5,14 @@ export default makeStyles((theme) => ({
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
-    backgroundColor: '#282c34'
+    backgroundColor: '#282c34',
+    maxWidth: '100vw'
   },
   navigation: {
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'center',
-    // flexWrap: 'wrap'
+    flexWrap: 'wrap',
   },
   topNavigation: {
     display: 'flex',

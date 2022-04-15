@@ -596,7 +596,7 @@ const GameContainer = () => {
   }, [guess])
 
   return (
-    <Container maxWidth='sm'>
+    <Container maxWidth='sm' className={classes.gameContainer}>
       {coverId ?
         <div className={classes.hintContainer}>
             {/* <Typography>Hint</Typography> */}
@@ -606,7 +606,9 @@ const GameContainer = () => {
         <CircularProgress />
       }
       <div className='guessData'>
-        {gameData.resultsData[day].map((result, index) => guessRender(result, index))}
+        <div className={classes.guessCarouselContainer}>
+          {gameData.resultsData[day].map((result, index) => guessRender(result, index))}
+        </div>
         <div>{checkSuccess() && (
           <>Success! The answer was {gameData.answerData.gameName} ({gameData.answerData.releaseDate})</>
         )}</div>

@@ -13,6 +13,11 @@
   color: white;
 }
 
+/* Hide the scrollbar for the carousel */
+::-webkit-scrollbar {
+  overflow: hidden;
+}
+
 /* .resolved {
   filter: blur(0px) !important;
 } */
