@@ -18,16 +18,17 @@ export default makeStyles((theme) => ({
   },
   autoSuggestContainer: {
     position: 'absolute',
-    // display: 'block',
     zIndex: '1',
-    // top: '0px'
+    //this makes the suggestions sit right on top of the form
     transform: 'translateY(-75%)'
   },
   guessCard: {
     padding: '0.5em',
     maxWidth: '80vw',
+    //need a more elegant solution for this
     minWidth: '25em',
-    marginRight: '1em'
+    marginRight: '1em',
+    'scroll-snap-align': 'center'
   },
   submissionContainer: {
     display: 'flex',
@@ -43,11 +44,12 @@ export default makeStyles((theme) => ({
     width: '100%',
     'overflow-x': 'auto',
     overflow: 'hidden',
-    maxWidth: '100vw'
-    // 'scrollbar-width': 'none'
-    // '::-webkit-scrollbar': '{display: none}'
+    maxWidth: '100vw',
+    'overscroll-behavior': 'contain',
+    'scroll-snap-type': 'x mandatory'
   },
   gameContainer: {
+    //resets the container so that it doesn't bleed on the sides of the mobile view
     padding: '0px'
   }
 }));
