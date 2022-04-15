@@ -24,7 +24,10 @@ export default makeStyles((theme) => ({
     transform: 'translateY(-75%)'
   },
   guessCard: {
-    padding: '0.5em'
+    padding: '0.5em',
+    maxWidth: '80vw',
+    minWidth: '25em',
+    marginRight: '1em'
   },
   submissionContainer: {
     display: 'flex',

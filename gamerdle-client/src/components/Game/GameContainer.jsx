@@ -24,8 +24,9 @@ const GameContainer = () => {
     suggestions: [],
     suggestId: ''
   });
-  const [open, setOpen] = useState(false)
-  const [warning, setWarning] = useState('')
+  const [open, setOpen] = useState(false);
+  const [warning, setWarning] = useState('');
+  const [visibleGuess, setVisibleGuess] = useState(0);
   const classes = useStyles();
   const loading = open && autoSuggest.suggestions.length === 0;
   //the library of answers
