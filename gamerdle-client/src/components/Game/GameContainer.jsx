@@ -613,14 +613,14 @@ const GameContainer = () => {
         <div>{gameData.guessData[day][5] && checkSuccess() === false  ? `The answer is: ${gameData.answerData.gameName}` : null}</div>
       </div>
       {(!gameData.guessData[day][5] && checkSuccess() === false) && 
-        <div className='guessSubmission' style={{marginTop: '2em'}}>
+        <div style={{marginTop: '2em'}}>
           <ClickAwayListener onClickAway={handleClickAway}>
             <Box>
-              <form autoComplete='off' noValidate className='guessForm' onSubmit={handleGuessSubmit}>
+              <form autoComplete='off' noValidate className={classes.submissionContainer} onSubmit={handleGuessSubmit}>
                 {loading && <CircularProgress />}
                 {open && autoSuggest.suggestions.length > 0 ? autoSuggestionRender(autoSuggest.suggestions) : null}
                 <TextField placeholder='Guess the game!' className='guessInput' onChange={(e) => setGuess(e.target.value, {/* setAutoSuggest({...autoSuggest, suggestId: ''}) */})} value={guess}/>
-                <Button variant='contained' style={{marginTop: '20px'}} type="submit">
+                <Button variant='contained' style={{marginTop: '20px', width: '50%'}} type="submit">
                   Submit Guess
                 </Button>
                 {warning && (

@@ -21,10 +21,18 @@ export default makeStyles((theme) => ({
     // display: 'block',
     zIndex: '1',
     // top: '0px'
-    transform: 'translateY(-100%)'
+    transform: 'translateY(-75%)'
   },
   guessCard: {
     padding: '0.5em'
+  },
+  submissionContainer: {
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center'
+    // width:'100%'
+    // alignContent: 'center'
   }
 }));
 
