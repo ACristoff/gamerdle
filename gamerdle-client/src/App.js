@@ -14,8 +14,8 @@ import './App.css';
 const App = () => {
 
   return (
-    <BrowserRouter>
-      <div className="App">
+    <div className="App">
+      <BrowserRouter>
         <div>
           <Header />
           <Routes>
@@ -28,8 +28,8 @@ const App = () => {
           </Routes>
         </div>
         <Footer />
-      </div>
-    </BrowserRouter>
+      </BrowserRouter>
+    </div>
   );
 }
 

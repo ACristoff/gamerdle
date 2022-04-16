@@ -596,6 +596,11 @@ const GameContainer = () => {
     }
   }, [guess])
 
+  // window.scrollBy({
+  //   behavior: 'smooth',
+  //   left: '200px'
+  // })
+
   return (
     <Container maxWidth='sm' className={classes.gameContainer}>
       {coverId ?
@@ -606,7 +611,7 @@ const GameContainer = () => {
         :
         <CircularProgress />
       }
-      <div className='guessData'>
+      <div className={classes.guessDataContainer}>
         <div className={classes.guessCarouselContainer}>
           {gameData.resultsData[day].map((result, index) => guessRender(result, index))}
         </div>

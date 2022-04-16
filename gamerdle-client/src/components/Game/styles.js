@@ -23,25 +23,36 @@ export default makeStyles((theme) => ({
     transform: 'translateY(-75%)'
   },
   guessCard: {
-    padding: '0.5em',
+    'padding-top': '1em',
     maxWidth: '80vw',
     //need a more elegant solution for this
-    minWidth: '25em',
+    minWidth: '330px',
+    overflow: 'scroll',
+    maxHeight: '60vh',
     marginRight: '1em',
     'scroll-snap-align': 'center'
+  },
+  guessDataContainer : {
+    width: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+    // justifyContent: 'center',
+    // alignContent: 'center',
+    alignItems: 'center'
   },
   submissionContainer: {
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
+    // 'margin-bottom': 'calc(20px + env(keyboard-inset-height))'
     // width:'100%'
     // alignContent: 'center'
   },
   guessCarouselContainer: {
     display: 'flex',
     flexDirection: 'row',
-    width: '100%',
+    width: '80%',
     'overflow-x': 'auto',
     overflow: 'hidden',
     maxWidth: '100vw',
@@ -56,7 +67,7 @@ export default makeStyles((theme) => ({
 
 // /* Hide scrollbar for Chrome, Safari and Opera */
 // .scrolling-card-list-container::-webkit-scrollbar {
-//   display: none;
+//   display: none; 
 // }
 
 // /* Hide scrollbar for IE, Edge and Firefox */
